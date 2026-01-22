@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hồ sơ y tế | DutuPulmo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2563eb",
+              "background-light": "#f8fafc",
+              "background-dark": "#0f172a",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "12px",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 transition-colors duration-200">
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-outlined text-white text-xl">air</span>
+</div>
+<span class="font-bold text-xl tracking-tight text-primary">DutuPulmo</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Trang chủ</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Lịch khám</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Tin nhắn</a>
+<a class="text-sm font-medium flex items-center gap-1 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-sm text-green-500">auto_awesome</span>
+                        Chat AI
+                    </a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex-1 min-w-[300px] hidden lg:block">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20" placeholder="Tìm bác sĩ, chuyên khoa..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-800"></div>
+<div class="flex items-center gap-3 ml-2">
+<div class="text-right hidden sm:block">
+<p class="text-xs text-slate-400">Xin chào,</p>
+<p class="text-sm font-semibold">Nguyễn Văn A</p>
+</div>
+<img alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBenycW-QbL42Tr9oWS6Xk5wZPli-OWZAi4Wf62EZ7vsxOiFV_QBf5CXb3oNAwvE4efojUD7CCxY1tQxjg40c890_qCaLNOb2fuStqfP5eh1Otq6ajMMMXMDNnlnbJz9f4gIRAH0LDSdmh-kfOwg_c4vpsVHj0nnkpTB6XVMKaqIJAE1_hULKRyAKkD0WMPb1Pgm8th9nhmkJ-Q4yjfZ76mxFdS-f_R_QDnOwCocFrM6fySk7YMMwDaBpceLCq8MHyfqn2OUNiAHw"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 py-8">
+<div class="flex flex-col lg:flex-row gap-8">
+<aside class="lg:w-72 space-y-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex flex-col items-center text-center">
+<div class="relative mb-3">
+<img alt="Avatar large" class="w-20 h-20 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8oXlt405qK_Rck7wdacjVQ0hZH0-1aZEL-AsNUGU5SAXPV0GGONnK7oU3CR2-Wd9RRmPHTMXttSXAWt9CP1evJQZoTrTRi52UEZewHgXBYI9dZ6MEp3ZIFf8MlBU5YM_i7KvvYZ7JsgVa3DNtkSxWo756Hs2xHkDKpcKJValSiRVz8L-nEKAhgHzH-oDWBJvvVoZJjP0rTng_opf8LaQVsd-Rv6vCelDcJZhQiyKFgl4d_UOXZc6nvQmla4jBVpVXcLzttRqpbw"/>
+<button class="absolute bottom-0 right-0 bg-primary text-white p-1.5 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center">
+<span class="material-icons-outlined text-xs">edit</span>
+</button>
+</div>
+<h3 class="font-bold text-lg">Nguyễn Văn A</h3>
+<p class="text-sm text-slate-500">+84 923 739 836</p>
+</div>
+</div>
+<nav class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-2">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/5 text-primary rounded-xl font-medium" href="#">
+<span class="material-icons-outlined text-[20px]">assignment_ind</span>
+<span class="text-sm">Hồ sơ y tế</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-outlined text-[20px]">favorite_border</span>
+<span class="text-sm">Danh sách quan tâm</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-outlined text-[20px]">gavel</span>
+<span class="text-sm">Điều khoản &amp; Quy định</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-outlined text-[20px]">groups</span>
+<span class="text-sm">Tham gia cộng đồng</span>
+</a>
+</li>
+<div class="py-2 px-4">
+<hr class="border-slate-100 dark:border-slate-800"/>
+</div>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-outlined text-[20px]">share</span>
+<span class="text-sm">Chia sẻ ứng dụng</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-outlined text-[20px]">headset_mic</span>
+<span class="text-sm">Liên hệ &amp; hỗ trợ</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-outlined text-[20px]">settings</span>
+<span class="text-sm">Cài đặt</span>
+</a>
+</li>
+<li class="pt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors font-medium" href="#">
+<span class="material-icons-outlined text-[20px]">logout</span>
+<span class="text-sm">Đăng xuất</span>
+</a>
+</li>
+</ul>
+</nav>
+</aside>
+<div class="flex-1 space-y-6">
+<section class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="mb-8">
+<h2 class="text-2xl font-bold mb-1">Thông tin cá nhân</h2>
+<p class="text-slate-500 text-sm">Quản lý thông tin hồ sơ của bạn để bảo mật tài khoản</p>
+</div>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Họ và tên</label>
+<input class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none" type="text" value="Nguyễn Văn A"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Giới tính</label>
+<select class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none">
+<option>Nam</option>
+<option>Nữ</option>
+<option>Khác</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Ngày sinh</label>
+<div class="relative">
+<input class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none" type="date" value="1995-06-15"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Email</label>
+<input class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none" type="email" value="du.nguyen@example.com"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Số điện thoại</label>
+<div class="flex gap-2">
+<input class="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 outline-none" readonly="" type="text" value="+84 923 739 836"/>
+<button class="text-sm font-medium text-primary hover:underline px-2" type="button">Thay đổi</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Nghề nghiệp</label>
+<input class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Nhập nghề nghiệp" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Địa chỉ</label>
+<textarea class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none" rows="3">123 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</textarea>
+</div>
+<div class="flex justify-end items-center gap-4 pt-4">
+<button class="px-6 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors" type="button">Hủy</button>
+<button class="px-8 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all" type="submit">Lưu thay đổi</button>
+</div>
+</form>
+</section>
+<section class="bg-blue-50/50 dark:bg-slate-900/40 p-6 rounded-2xl border border-blue-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+<span class="material-icons-outlined text-primary">security</span>
+</div>
+<div>
+<h4 class="font-bold">Bảo mật tài khoản</h4>
+<p class="text-sm text-slate-500">Cập nhật mật khẩu thường xuyên để bảo vệ thông tin sức khỏe của bạn.</p>
+</div>
+</div>
+<button class="px-6 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Đổi mật khẩu</button>
+</section>
+</div>
+</div>
+</main>
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-12 py-16">
+<div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+<div class="space-y-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-outlined text-white text-xl">air</span>
+</div>
+<span class="font-bold text-xl tracking-tight text-primary">DutuPulmo</span>
+</div>
+<p class="text-sm text-slate-500 leading-relaxed">Nền tảng chăm sóc sức khỏe phổi hàng đầu, kết nối bệnh nhân với đội ngũ chuyên gia và công nghệ AI hiện đại.</p>
+</div>
+<div>
+<h5 class="font-bold mb-6">Dịch vụ</h5>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">Đặt khám bác sĩ</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Tư vấn video</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Phân tích kết quả AI</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Chăm sóc tại nhà</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6">Hỗ trợ</h5>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">Câu hỏi thường gặp</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Chính sách bảo mật</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Điều khoản sử dụng</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Liên hệ hỗ trợ</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6">Tải ứng dụng</h5>
+<div class="space-y-3">
+<a class="flex items-center gap-3 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-colors" href="#">
+<img alt="App Store" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD0953_PyHrkWgYYAXPZgSfKKiCfpUU05AfOa6xT9R4DRST-jFa1SMby6W5HQNao8FpeWJMCxIh-kKyDwn7EPAjyCJZuMfwZ673WCobpehnmv7INEYeX1KC07S2JyD2vN_gkHiVmD0IE5EI_8wzGGMbqDNpgR5h-LsEWxKh-DaOHckMSTkuKF-Urw1WZiqfhyMA88H6X8Uei-RfRwgEvvVZ25G6h-LuW7vITOn7Nvd5xMcmzFIqPaZD_mgsacBRWdthC5gGRzx7g"/>
+<div class="text-left">
+<p class="text-[10px] uppercase leading-none opacity-70">Download on the</p>
+<p class="text-sm font-semibold leading-tight">App Store</p>
+</div>
+</a>
+<a class="flex items-center gap-3 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-colors" href="#">
+<img alt="Google Play" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4ABNmvb0MD4zli4JhVehnPDFvg7XQu9FbYhseziBZsU7yf_oJZ57qtgH-XLjURnj5viwpqtvSqvv-sxUrFyPmJ-d6DjS13dHNuJheOPOlE9b0rJFGc7uLfGb7bu73XHVAEOYt9n-fDfeWdLn5LcP29jwZJ-W71QEtuaWu5Vq8BUWVDbWO4WxkI448ITCK80IbWGQTffocP9GU8bo4c_ZJOEG6vLYgsIUZ9_qvhaycD9GFnU_qpq7vKV_UFwCNkMMxw_DFpIjc2w"/>
+<div class="text-left">
+<p class="text-[10px] uppercase leading-none opacity-70">Get it on</p>
+<p class="text-sm font-semibold leading-tight">Google Play</p>
+</div>
+</a>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
+<p class="text-xs text-slate-400">© 2023 DutuPulmo. All rights reserved. Designed for Health.</p>
+</div>
+</footer>
+<button class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 shadow-xl rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-outlined">dark_mode</span>
+</button>
+
+</body></html>

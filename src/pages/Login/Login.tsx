@@ -1,4 +1,101 @@
+import { useState,useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../services/auth.service";
+import axios from "axios";
+
 function Login() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const userStr = localStorage.getItem("user");
+
+    if (token && userStr) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
+
+
+  const handleLogin = async () => {
+    const newErrors: typeof errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.trim()) {
+      newErrors.email = "Vui lòng nhập email";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Email không đúng định dạng";
+    }
+
+    if (!password) {
+      newErrors.password = "Vui lòng nhập mật khẩu";
+    } else if (password.length < 8) {
+      newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
+    } else if (
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[!@#$%^&*(),.?":{}|<>]/.test(password)
+    ) {
+      newErrors.password =
+        "Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường và 1 số và 1 ký tự đặc biệt";
+    } else if (password.length > 128) {
+      newErrors.password = "Mật khẩu không quá 128 ký tự";
+    } 
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setErrors({});
+
+      const res = await login(email, password);
+
+      const { accessToken, refreshToken, account } = res;
+      const user = account.user;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user", JSON.stringify(user));
+      
+      navigate("/");
+      
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        // 401: sai email/mật khẩu
+        if (status === 401) {
+          setErrors({ password: "Mật khẩu hoặc email không đúng" });
+          return;
+        }
+
+        // 403: chưa xác nhận email / không có quyền
+        if (status === 403) {
+          setErrors({ email: "Email chưa được xác nhận" });
+          return;
+        }
+        setErrors({
+          password: "Đăng nhập thất bại",
+        });
+      } else {
+        setErrors({ password: "Đăng nhập thất bại" });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
 
@@ -97,29 +194,41 @@ function Login() {
               <p className="text-gray-500">Đăng nhập để tiếp tục chăm sóc sức khỏe</p>
             </div>
 
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-              {/* Số điện thoại */}
+            <form className="space-y-5"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!loading) handleLogin();
+            }}
+            >
+              {/* Email */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 ml-1">
-                  Số điện thoại
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 ml-1">
+                  Email
                 </label>
 
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <span className="material-symbols-rounded text-gray-400 text-xl">
-                      smartphone
+                      mail
                     </span>
                   </div>
 
                   <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="Nhập số điện thoại"
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Nhập email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="block w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-gray-900 dark:text-white ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-400"
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1.5">{errors.email}</p>
+                )}
               </div>
+
 
               {/* Mật khẩu */}
               <div>
@@ -127,10 +236,6 @@ function Login() {
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Mật khẩu
                   </label>
-
-                  <a href="#" className="text-xs font-semibold text-primary hover:underline">
-                    Quên mật khẩu?
-                  </a>
                 </div>
 
                 <div className="relative">
@@ -143,23 +248,45 @@ function Login() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Nhập mật khẩu"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="block w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-gray-900 dark:text-white ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-400"
                   />
 
-                  <button type="button" className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                  <button type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    
                     <span className="material-symbols-rounded text-xl">
-                      visibility
+                      {showPassword ? "visibility_off" : "visibility"}
+                      {/* visibility */}
                     </span>
                   </button>
                 </div>
+                <div className="flex items-center justify-between mt-1.5 ml-1">
+                  <div>{errors.password && (
+                    <p className="text-red-500 text-xs">{errors.password}</p>
+                  )}</div>
+
+                  <a href="#" className="text-xs font-semibold text-primary hover:underline">
+                    Quên mật khẩu?
+                  </a>
+                </div>
+                
               </div>
 
               {/* Nút đăng nhập */}
-              <button type="submit" className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]">
-                Đăng nhập
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-50"
+              >
+                {loading ? "Đang đăng nhập..." : "Đăng nhập"}
               </button>
+
             </form>
 
             {/* Divider */}

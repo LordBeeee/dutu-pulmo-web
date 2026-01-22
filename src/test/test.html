@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dutu Pulmo - Chăm sóc sức khỏe phổi toàn diện</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#007AFF",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-gradient {
+            background: linear-gradient(135deg, #007AFF 0%, #00C6FF 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+<div class="flex items-center gap-2 flex-shrink-0">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-round text-white text-xl">pulmonology</span>
+</div>
+<span class="text-xl font-bold text-primary tracking-tight">Dutu Pulmo</span>
+</div>
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-primary font-semibold border-b-2 border-primary py-5" href="#">Trang chủ</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors py-5" href="#">Lịch khám</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors py-5" href="#">Tin nhắn</a>
+<a class="flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors py-5" href="#">
+<span class="material-icons-round text-sm">auto_awesome</span> Chat AI
+                </a>
+</nav>
+<div class="flex-grow max-w-md hidden md:block">
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Tìm bác sĩ, chuyên khoa..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-icons-round">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-slate-200 dark:border-slate-800">
+<div class="text-right hidden sm:block">
+<p class="text-xs text-slate-500 dark:text-slate-400">Xin chào,</p>
+<p class="text-sm font-semibold">Nguyễn Văn A</p>
+</div>
+<img alt="User avatar" class="w-9 h-9 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHfJpgIBQyp-ANhnUeZrOBJH-W61SGNuXnZ9ewXcYU7Q2sW6ER6B_A9eMH07NL5yls4xlhMALaNu4-oVN80FEdtsKwm4Y6jbCSNKILvn01dsH0Vn9xJGuiQcMrAlcOIgIsoZXIwsTDeu5-AZW89SrE1yEwFyG23fKaGb92l8pPAZCUO2AVLwcBhIREyHXi4a9a8CIxUzX9DZCH7Tyy5foe1yEg7Oexr1nadzZ1J79RPDCwlYvXq99rsrkE3LUTFuFJV6wt1VNhXw"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-12">
+<section class="relative hero-gradient rounded-3xl overflow-hidden p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center justify-between">
+<div class="max-w-xl space-y-6 z-10 text-white">
+<span class="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider">
+                    Chăm sóc toàn diện
+                </span>
+<h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+                    Chăm sóc sức khỏe<br/>phổi toàn diện
+                </h1>
+<p class="text-blue-50 text-lg opacity-90">
+                    Đặt lịch khám với các chuyên gia hàng đầu và nhận tư vấn AI tức thì cho sức khỏe của bạn.
+                </p>
+<button class="bg-white text-primary font-bold px-8 py-4 rounded-xl flex items-center gap-2 hover:bg-blue-50 transition-all shadow-lg shadow-blue-900/20 group">
+                    Khám phá ngay
+                    <span class="material-icons-round transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+<div class="hidden md:block absolute right-0 bottom-0 top-0 w-1/2">
+<img alt="Doctor banner" class="h-full w-full object-cover object-top opacity-90 mix-blend-screen grayscale brightness-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_nvQ4WpWhKskJLpvSpOdNMVcHXhkN8OO59HNAaidBnDVb9NlN6T6Iu7faTS3DmLr5Dyzb1KM--WbMJqnUvxuTcXg_RPwEMWmQy1sNUAXXloUP-AiTqoBzmo7XRIKsuQGCRm_yKLBXwfDP3vLayzWkKWaia2gwxfba9BtVo0NSKmDJ40p1idHCOrs2KN35bkUUyGMtBEnoBFchMBWqZb3r9kKjfOLvuLnwsaLTD-UKgJNvheluEKLZRuEl-rfN2IYQJ2hbF6O80g"/>
+</div>
+</section>
+<section class="grid grid-cols-4 md:grid-cols-8 gap-4">
+            {[
+                {icon: 'person_add', label: 'Đặt khám bác sĩ', color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'},
+                {icon: 'local_hospital', label: 'Phòng khám', color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400'},
+                {icon: 'domain', label: 'Bệnh viện', color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'},
+                {icon: 'psychology', label: 'Phân tích AI', color: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'},
+                {icon: 'chat', label: 'Chat bác sĩ', color: 'bg-teal-50 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400'},
+                {icon: 'videocam', label: 'Video call', color: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'},
+                {icon: 'description', label: 'Hồ sơ sức khỏe', color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'},
+                {icon: 'newspaper', label: 'Tin tức y khoa', color: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400'},
+            ].map(item =&gt; `
+                <div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="w-14 h-14 ${item.color} rounded-2xl flex items-center justify-center shadow-sm group-hover:-translate-y-1 transition-transform">
+<span class="material-icons-round text-2xl">${item.icon}</span>
+</div>
+<span class="text-[11px] md:text-xs font-medium text-center text-slate-600 dark:text-slate-400 line-clamp-2">${item.label}</span>
+</div>
+            `).join('')}
+        </section>
+<section>
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-2xl font-bold">Bác sĩ nổi bật</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Đội ngũ chuyên gia giàu kinh nghiệm</p>
+</div>
+<a class="text-primary font-semibold text-sm flex items-center gap-1 hover:underline" href="#">
+                    Xem tất cả <span class="material-icons-round text-sm">chevron_right</span>
+</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                    {name: 'BS. Trần Văn A', spec: 'Chuyên khoa Hô hấp', rating: '4.9', img: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&amp;h=300&amp;fit=crop'},
+                    {name: 'ThS.BS. Lê Thị B', spec: 'Chuyên khoa Nội tiết', rating: '4.8', img: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=300&amp;h=300&amp;fit=crop'},
+                    {name: 'PGS.TS. Nguyễn Văn C', spec: 'Chuyên khoa Tim mạch', rating: '5.0', img: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=300&amp;h=300&amp;fit=crop'},
+                    {name: 'BS. Phạm Thị D', spec: 'Chuyên khoa Hô hấp nhi', rating: '4.7', img: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?w=300&amp;h=300&amp;fit=crop'}
+                ].map(doc =&gt; `
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 shadow-sm hover:shadow-xl transition-all border border-slate-100 dark:border-slate-700 group">
+<div class="relative mb-4">
+<img alt="${doc.name}" class="w-full aspect-square object-cover rounded-2xl grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFNsq6UZMW1mF2rT3HyWCjE3E3xI8Ymg8a046GObLkjjp02cP-QQyPoFQHQiw-7Nwk5uzuMXY4uO8KBq8NwSOWuyJJ5gp4rQsLrqYYEmp5C-DdRPEIXXWLDMakH7yPf-DGwoKjnM7DYy-DbqVVmqS2BozX26lzKh8_DEeTNSsdpfKDX9V0plNKRjy0CSzUirsS1Zv6UcMMVMu8ovV3kJuZTZb2qKYGDajq1zbPRJbDm6qXFJ1mlC5GkBp8Rieayofgq4xvEjCNiA"/>
+<div class="absolute top-2 right-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+<span class="material-icons-round text-yellow-400 text-xs">star</span>
+<span class="text-xs font-bold">${doc.rating}</span>
+</div>
+</div>
+<h3 class="font-bold text-lg mb-1">${doc.name}</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-3">${doc.spec}</p>
+<div class="flex items-center gap-1 text-[11px] text-slate-400">
+<span class="material-icons-round text-sm">location_on</span> Hà Nội
+                        </div>
+</div>
+                `).join('')}
+            </div>
+</section>
+<div class="grid lg:grid-cols-3 gap-8">
+<section class="lg:col-span-2">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold">Cơ sở y tế</h2>
+<a class="text-primary font-semibold text-sm flex items-center gap-1" href="#">Xem tất cả</a>
+</div>
+<div class="space-y-4">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-primary">
+<span class="material-icons-round">local_hospital</span>
+</div>
+<div>
+<h4 class="font-bold">Bệnh viện Đa khoa Tâm Anh</h4>
+<p class="text-xs text-slate-500">2B Phổ Quang, Phường 2, Q. Tân Bình, TP. HCM</p>
+<span class="inline-block mt-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase">Bệnh viện</span>
+</div>
+</div>
+<span class="material-icons-round text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-green-50 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-500">
+<span class="material-icons-round">home_health</span>
+</div>
+<div>
+<h4 class="font-bold">Shine Clinic By TS.BS Trần N.</h4>
+<p class="text-xs text-slate-500">68 Trương Định, P.6, Q.3, TP.HCM</p>
+<span class="inline-block mt-1 text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full uppercase">Phòng khám</span>
+</div>
+</div>
+<span class="material-icons-round text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold">Chuyên khoa</h2>
+<a class="text-primary font-semibold text-sm flex items-center gap-1" href="#">Tất cả</a>
+</div>
+<div class="grid grid-cols-2 gap-3">
+                    {[
+                        {name: 'Hô hấp', icon: 'air', color: 'bg-blue-50 text-blue-500'},
+                        {name: 'Lồng ngực', icon: 'accessibility_new', color: 'bg-green-50 text-green-500'},
+                        {name: 'Nội hô hấp', icon: 'medical_services', color: 'bg-red-50 text-red-500'},
+                        {name: 'Lao phổi', icon: 'coronavirus', color: 'bg-yellow-50 text-yellow-500'},
+                    ].map(item =&gt; `
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col items-center gap-2 hover:shadow-md transition-shadow cursor-pointer">
+<div class="w-10 h-10 ${item.color} dark:bg-slate-700 rounded-full flex items-center justify-center">
+<span class="material-icons-round text-xl">${item.icon}</span>
+</div>
+<span class="text-xs font-semibold">${item.name}</span>
+</div>
+                    `).join('')}
+                </div>
+</section>
+</div>
+<section>
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-2xl font-bold">Tin tức y khoa</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Cập nhật thông tin sức khỏe mới nhất</p>
+</div>
+<a class="text-primary font-semibold text-sm flex items-center gap-1" href="#">Xem tất cả</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                    {title: 'Cách bảo vệ phổi hiệu quả trong mùa ô nhiễm', date: '10/10/2023', img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=500&amp;fit=crop', badge: 'Nổi bật'},
+                    {title: '5 loại thực phẩm giúp thanh lọc phổi tự nhiên', date: '15/09/2023', img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&amp;fit=crop'},
+                    {title: 'Các bài tập thở đơn giản giúp tăng dung tích phổi', date: '10/12/2023', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500&amp;fit=crop'}
+                ].map(news =&gt; `
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col h-full group">
+<div class="relative h-48 overflow-hidden">
+<img alt="${news.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArIbTt3AQyy5CIjHbJ1JOtgB4fRsH4g3zIcQlydTPrdmBIVbGQHoWlallMqLXatBdlOGzq-dXNoRsDTNhMkWcqSi7zVFG8eDlyzc26HMsn2E3v98Y4lBg--Wnf2nDvB7QgWXs6SaBp_F0U-hQpbTkXqBFr3gKIQheI-7iH-w3gszXkvEYZmUJJ9QF7pCJ34qiBaTPoeOJcN35CxxlDHmu-7Y5tR8o0Z4sZde4-ZkAh7WFbaE8cQGqUNYC-ath2GJeS7ko8mOiK7A"/>
+                            ${news.badge ? `<span class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase">${news.badge}</span>` : ''}
+                        </div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="font-bold text-lg mb-3 leading-snug group-hover:text-primary transition-colors">${news.title}</h3>
+<div class="mt-auto flex items-center gap-2 text-xs text-slate-400">
+<span class="material-icons-round text-sm">calendar_today</span>
+                                ${news.date}
+                            </div>
+</div>
+</div>
+                `).join('')}
+            </div>
+</section>
+</main>
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-8">
+<div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+<div class="space-y-6">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-round text-white text-xl">pulmonology</span>
+</div>
+<span class="text-xl font-bold text-primary tracking-tight">Dutu Pulmo</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Nền tảng chăm sóc sức khỏe phổi hàng đầu, kết nối bệnh nhân với đội ngũ chuyên gia và công nghệ AI hiện đại.
+                </p>
+</div>
+<div>
+<h5 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-400">Dịch vụ</h5>
+<ul class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">Đặt khám bác sĩ</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Tư vấn video</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Phân tích kết quả AI</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Chăm sóc tại nhà</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-400">Hỗ trợ</h5>
+<ul class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">Câu hỏi thường gặp</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Chính sách bảo mật</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Điều khoản sử dụng</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Liên hệ hỗ trợ</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-400">Tải ứng dụng</h5>
+<div class="space-y-3">
+<a class="flex items-center gap-3 bg-slate-900 text-white px-4 py-2 rounded-xl border border-slate-700 hover:bg-black transition-colors" href="#">
+<img alt="Apple logo" class="w-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbLBv6mC0kUD8wq7fzafIfTgRz8quvxnZmnOqKa-0BKAQ8vcV7j_xeVV7Sad0ljHCfhdeMZ1KQPMoCV1OCQ7qoeuhzdOBRwzF-42ORyC-RVLbgfflrL2d4d3KHuDhms10SB5O8ca1HNp9KEy9aTmXjuYmW1G6iI7bUjE08dfEQPbbz-v5JA3aMS8RW7A5SGyOHPXFTz1Zvom-Bn8MHDmurZcRSoX1NAOwQoL925mCqSYV785j_WoMXr4Q8fYiDHPTDIZMklkaSWQ"/>
+<div class="text-left">
+<p class="text-[10px] opacity-70 leading-none">Download on the</p>
+<p class="text-sm font-bold leading-tight">App Store</p>
+</div>
+</a>
+<a class="flex items-center gap-3 bg-slate-900 text-white px-4 py-2 rounded-xl border border-slate-700 hover:bg-black transition-colors" href="#">
+<img alt="Google Play logo" class="w-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXvs8uXmQ2mpzvUWRz56v_GyEKJQQ_J4cIBGVMNbX-uVjzwKuT4tsPfD1jl5bPAfXOA8jvag2pjmya7x28tNykCBgcU5CZrzAWBLeHXYKS9cBnBTU5cqjOqSr9-kvzJNMWqVnjkz7Yh5lqgHdYiVA97y8lFBRR_9S6xQNtnzBXTCQNnoTry75udnDRSSOsLTBA0bZZX9UYcmDYC5QPSV-LZLUEgb-pqQL8rXlWqKLQGixo0N59y311dbV71ohZRCiPkG_rw2C7Dw"/>
+<div class="text-left">
+<p class="text-[10px] opacity-70 leading-none">GET IT ON</p>
+<p class="text-sm font-bold leading-tight">Google Play</p>
+</div>
+</a>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-4 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
+<p class="text-xs text-slate-400">© 2023 Dutu Pulmo. All rights reserved. Designed for Health.</p>
+</div>
+</footer>
+<button class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-2xl flex items-center justify-center border border-slate-200 dark:border-slate-700 z-[100] text-slate-600 dark:text-yellow-400" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-round dark:hidden">dark_mode</span>
+<span class="material-icons-round hidden dark:block">light_mode</span>
+</button>
+
+</body></html>
