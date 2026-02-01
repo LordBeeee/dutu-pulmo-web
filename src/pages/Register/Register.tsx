@@ -74,7 +74,7 @@ function Register() {
       await register(email, password, fullName);
 
       // chuyển sang trang OTP và mang theo email
-      navigate("/register/OTP", { state: { email } });
+      navigate("/verify-OTP", { state: { email } });
 
     } catch (err) {
       if (axios.isAxiosError(err)) {

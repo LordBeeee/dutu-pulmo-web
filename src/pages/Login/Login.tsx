@@ -181,11 +181,6 @@ function Login() {
           <div className="w-full max-w-md">
 
             <div className="text-center mb-10">
-              {/* <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                <span className="material-symbols-rounded text-primary text-4xl">
-                  respiratory_rate
-                </span>
-              </div> */}
               <div className=" flex items-center justify-center">
                 <img src="/src/assets/Logo/logoduoi_konen.png" alt=""/>
               </div>
@@ -271,7 +266,7 @@ function Login() {
                     <p className="text-red-500 text-xs">{errors.password}</p>
                   )}</div>
 
-                  <a href="#" className="text-xs font-semibold text-primary hover:underline">
+                  <a href="/forgot-password" className="text-xs font-semibold text-primary hover:underline">
                     Quên mật khẩu?
                   </a>
                 </div>

@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
-import OTP from './pages/Register/OTP'
+import VerifyOTP from './pages/Verify-otp/VerifyOTP'
 import Home from './pages/Home/Home'
 import MainLayout from './layouts/MainLayout'
 import Profile from './pages/Profile/Profile'
+import ForgotPassword from './pages/forgot-password/ForgotPassword'
+import ResetPassword from './pages/Reset-password/ResetPassword'
 
 function App() {
   return (
@@ -12,9 +14,9 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/register/OTP" element={<OTP />} />
-        
-
+        <Route path="/verify-OTP" element={<VerifyOTP />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />

@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
 
-function OTP() {
+function VerifyOTP() {
     const navigate = useNavigate();
     const location = useLocation();
     const email = location.state?.email;
@@ -43,7 +43,7 @@ function OTP() {
             setError(null);
 
             inputsRef.current[0]?.focus();
-        } catch (err) {
+        } catch {
             setError("Không thể gửi lại mã OTP. Vui lòng thử lại.");
         } finally {
             setLoading(false);
@@ -91,6 +91,9 @@ function OTP() {
     // Xử lý thay đổi input
     const handleChange = (value: string, index: number) => {
         if (!/^\d?$/.test(value)) return;
+
+        // Không cho nhập nếu ô trước chưa có
+        if (index > 0 && otp[index - 1] === "") return;
 
         // Xóa lỗi khi người dùng nhập lại
         if (error) setError(null);
@@ -178,6 +181,12 @@ function OTP() {
             ))}
             </div>
 
+            {error && (
+            <div className="text-center text-sm text-red-500 font-medium mb-6">
+                {error}
+            </div>
+            )}
+
             {/* Gửi lại mã OTP */}
             <div className="text-center mb-10">
             {!canResend ? (
@@ -197,20 +206,12 @@ function OTP() {
                 </button>
             )}
             </div>
-
-            {/* Submit */}
-            {/* <button
-            className="w-full bg-primary hover:bg-blue-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/20"
-            >
-            Xác nhận
-                <span className="material-symbols-outlined text-xl">
-                    arrow_right_alt
-                </span>
-            </button> */}
-
+            <div className="text-center text-sm font-medium mb-6">
+                Mã OTP có hiệu lực trong 5 phút
+            </div>
         </div>
         </div>
     )
 }
 
-export default OTP
+export default VerifyOTP

@@ -16,3 +16,7 @@ export const register = ( email: string, password: string, fullName: string
     fullName,
   });
 };
+
+export const forgotPassword = (email: string) => {
+  return api.post("/auth/forgot-password", { email })
+}
