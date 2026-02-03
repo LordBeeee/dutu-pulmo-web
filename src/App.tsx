@@ -7,6 +7,7 @@ import MainLayout from './layouts/MainLayout'
 import Profile from './pages/Profile/Profile'
 import ForgotPassword from './pages/forgot-password/ForgotPassword'
 import ResetPassword from './pages/Reset-password/ResetPassword'
+import DoctorAppointment from './pages/Doctor-appointment/Doctor-appointment'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/doctor-appointment" element={<DoctorAppointment />} />
         </Route>
 
       </Routes>

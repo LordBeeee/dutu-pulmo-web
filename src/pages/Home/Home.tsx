@@ -49,12 +49,12 @@ function Home () {
             </section>
 
             <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-                <div className="flex flex-col items-center group cursor-pointer">
-                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-primary mb-3 group-hover:scale-110 transition-transform">
-                    <span className="material-icons-round text-3xl">person_search</span>
-                </div>
-                <span className="text-sm font-medium text-center">Đặt khám bác sĩ</span>
-                </div>
+                <a className="flex flex-col items-center group cursor-pointer" href="/doctor-appointment">
+                    <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-primary mb-3 group-hover:scale-110 transition-transform">
+                        <span className="material-icons-round text-3xl">person_search</span>
+                    </div>
+                    <span className="text-sm font-medium text-center">Đặt khám bác sĩ</span>
+                </a>
 
                 <div className="flex flex-col items-center group cursor-pointer">
                 <div className="w-16 h-16 bg-green-50 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-500 mb-3 group-hover:scale-110 transition-transform">
