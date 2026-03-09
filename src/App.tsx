@@ -8,8 +8,20 @@ import Profile from './pages/Profile/Profile'
 import ForgotPassword from './pages/forgot-password/ForgotPassword'
 import ResetPassword from './pages/Reset-password/ResetPassword'
 import DoctorAppointment from './pages/Doctor-appointment/Doctor-appointment'
-
+import Appointment from './pages/Appointment/Appointment'
+import { http } from './services/http'
+import { useEffect } from 'react'
+import AppointmentConfirm from './pages/Appointment/AppointmentConfirm'
+import AppointmentSuccess from './pages/Appointment/AppointmentSuccess'
+import PaymentSuccess from './pages/Payment/PaymentSuccess'
 function App() {
+
+  useEffect(() => {
+    http.get("/") // hoặc endpoint khác
+      .then(res => console.log("OK", res.data))
+      .catch(err => console.log("ERR", err?.response?.status, err?.response?.data || err.message));
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -22,10 +34,15 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/doctor-appointment" element={<DoctorAppointment />} />
+          <Route path="/appointment" element={<Appointment/>} />
+          <Route path="/appointment-confirm" element={<AppointmentConfirm/>} />
+          <Route path="/appointment-success" element={<AppointmentSuccess/>} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
         </Route>
 
       </Routes>
     </BrowserRouter>
+
   )
 }
 

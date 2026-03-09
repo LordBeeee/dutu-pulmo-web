@@ -78,11 +78,24 @@ function Register() {
 
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setErrors({
-          email: "Email đã tồn tại",
-        });
+        // setErrors({
+        //   email: "Email đã tồn tại",
+        // });
+        const status = err.response?.status;
+        const message = err.response?.data?.message;
+
+        if (status === 409) {
+          setErrors({ email: "Email đã tồn tại" });
+        } else if (status === 400) {
+          setErrors({ confirmPassword: message || "Dữ liệu không hợp lệ" });
+        } else if (status === 500) {
+          setErrors({ confirmPassword: "Hệ thống đang lỗi, vui lòng thử lại sau" });
+        } else {
+          setErrors({ confirmPassword: message || "Đăng ký thất bại" });
+        }
       } else {
-        setErrors({ email: "Đăng ký thất bại" });
+        // setErrors({ email: "Đăng ký thất bại" });
+        setErrors({ confirmPassword: "Có lỗi xảy ra, vui lòng thử lại" });
       }
     } finally {
       setLoading(false);

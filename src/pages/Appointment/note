@@ -1,0 +1,325 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+
+function Appointment() {
+    interface Doctor {
+        id: string;
+        fullName: string;
+        gender: "MALE" | "FEMALE";
+        avatarUrl: string | null;
+        title: string | null;
+        specialty: string;
+        yearsOfExperience: number;
+        address: string | null;
+
+        defaultConsultationFee: string;
+        primaryHospital?: {
+        id: string;
+        name: string;
+        };
+    }
+    const location = useLocation();
+    // const navigate = useNavigate();
+
+    const doctorId = location.state?.doctorId;
+
+    const [doctor, setDoctor] = useState<Doctor | null>(null);
+
+    // nếu user refresh hoặc vào thẳng URL
+    // if (!doctorId) {
+    //     navigate("/doctor-appointment");
+    //     return null;
+    // }
+
+    useEffect(() => {
+        if (!doctorId) return;
+
+        fetch(`http://localhost:3000/public/doctors/${doctorId}`)
+            .then((res) => res.json())
+            .then((data) => {
+            setDoctor(data.data);
+            });
+    }, [doctorId]);
+
+
+    return (
+        <main className="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
+        <nav className="flex text-xs text-slate-400 mb-6 space-x-2">
+            <span>Trang chủ</span>
+            <span>/</span>
+            <span>Đặt lịch bác sĩ</span>
+            <span>/</span>
+            <span className="text-primary">Đặt lịch khám</span>
+        </nav>
+
+        <h1 className="text-2xl font-bold mb-8">Đặt lịch khám</h1>
+
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 mb-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex items-center max-w-2xl mx-auto">
+            <div className="flex flex-col items-center flex-1">
+                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mb-2 font-medium">
+                1
+                </div>
+                <span className="text-xs font-medium text-primary">Chọn lịch khám</span>
+            </div>
+
+            <div className="h-[1px] bg-slate-200 dark:bg-slate-800 flex-grow -mt-6"></div>
+
+            <div className="flex flex-col items-center flex-1">
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-2 font-medium">
+                2
+                </div>
+                <span className="text-xs font-medium text-slate-400">Xác nhận</span>
+            </div>
+
+            <div className="h-[1px] bg-slate-200 dark:bg-slate-800 flex-grow -mt-6"></div>
+
+            <div className="flex flex-col items-center flex-1">
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-2 font-medium">
+                3
+                </div>
+                <span className="text-xs font-medium text-slate-400">Thanh toán</span>
+            </div>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside className="lg:col-span-4 space-y-6">
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                {/* <div className="flex space-x-4">
+                    <div className="relative">
+                        <img
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAcPjM44Y8s6QMWM5hL4TUmWO_YM71nb3S7Wg22UF9veYX1EqwHbxkwrVC2PXSgs0q-s8qUjFP7W_ocQC5qJYIHOu9qa5KrpiFv_dBbrZsXQZGfsnjTOg7JHSV4U1bZ6NtrY3m5qxMgCm9SzoJRdp6a7YxO7frJ_umZYUD0IRDqwQdfMkk7-Kg8ZYSKL6d5TiT6vh5k5tiqOR9SlyNbqABDy1m6jlIuVSgaDHCHOUXFJB8gCXuDw4h8p0nbfEYYImi7FEGs_WdnCk"
+                        alt="Doctor avatar"
+                        className="w-16 h-16 rounded-xl object-cover"
+                        />
+                        <div className="absolute -bottom-1 -right-1 bg-primary text-white p-1 rounded-md">
+                        <span className="material-icons text-[12px]">verified</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                        Bác sĩ chuyên khoa I
+                        </p>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white uppercase">
+                        Nguyễn Văn A
+                        </h3>
+                        <p className="text-xs text-primary font-medium">
+                        Chuyên khoa: Y học cổ truyền
+                        </p>
+                    </div>
+                </div> */}
+                {doctor && (
+                <div className="flex space-x-4">
+                    <div className="relative">
+                    <img
+                        src={doctor.avatarUrl ?? "https://via.placeholder.com/150"}
+                        alt={doctor.fullName}
+                        className="w-16 h-16 rounded-xl object-cover"
+                    />
+                    {/* <div className="absolute -bottom-1 -right-1 bg-primary text-white p-1 rounded-md">
+                        <span className="material-icons text-[12px]">verified</span>
+                    </div> */}
+                    </div>
+
+                    <div>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                        {doctor.title ?? "Bác sĩ"}
+                    </p>
+
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white uppercase">
+                        {doctor.fullName}
+                    </h3>
+
+                    <p className="text-xs text-primary font-medium">
+                        Chuyên khoa: {doctor.specialty}
+                    </p>
+                    </div>
+                </div>
+                )}
+
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center space-x-2 mb-6">
+                <span className="material-icons text-primary">person</span>
+                <h4 className="font-bold">Hồ sơ bệnh nhân</h4>
+                </div>
+
+                <div className="space-y-4">
+                <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Họ và tên</span>
+                    <span className="font-semibold">Tuấn</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Giới tính</span>
+                    <span className="font-semibold">Nam</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Ngày sinh</span>
+                    <span className="font-semibold">30/05/2003</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Điện thoại</span>
+                    <span className="font-semibold">0901038251</span>
+                </div>
+                </div>
+
+                <div className="mt-8 flex justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+                <button className="text-primary text-xs font-semibold flex items-center">
+                    Xem chi tiết
+                </button>
+                <button className="text-primary text-xs font-semibold flex items-center">
+                    Sửa hồ sơ
+                </button>
+                </div>
+            </div>
+
+            <button className="w-full flex items-center justify-center space-x-2 text-primary font-medium py-3 border border-dashed border-primary/40 rounded-xl hover:bg-primary/5 transition-colors">
+                <span>Chọn hoặc tạo hồ sơ khác</span>
+                <span className="material-icons text-sm">arrow_forward</span>
+            </button>
+            </aside>
+
+            <div className="lg:col-span-8 space-y-6">
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center space-x-2 mb-6">
+                <span className="material-icons text-primary">calendar_today</span>
+                <h4 className="font-bold">Chọn ngày khám</h4>
+                </div>
+
+                <div className="max-w-md mx-auto">
+                    <div className="flex items-center justify-between mb-6 px-4">
+                        <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                        <span className="material-icons">chevron_left</span>
+                        </button>
+                        <span className="font-bold text-primary">Tháng 01 - 2026</span>
+                        <button className="p-2 bg-primary text-white rounded-lg">
+                        <span className="material-icons">chevron_right</span>
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-7 text-center text-xs mb-4">
+                        <div className="text-slate-400 py-2">CN</div>
+                        <div className="text-slate-400 py-2">T2</div>
+                        <div className="text-slate-400 py-2">T3</div>
+                        <div className="text-slate-400 py-2">T4</div>
+                        <div className="text-slate-400 py-2">T5</div>
+                        <div className="text-slate-400 py-2">T6</div>
+                        <div className="text-slate-400 py-2">T7</div>
+
+                        <div className="py-3 text-slate-300"></div>
+                        <div className="py-3 text-slate-300"></div>
+                        <div className="py-3 text-slate-300"></div>
+                        <div className="py-3 text-slate-300"></div>
+
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">1</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">2</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">3</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">4</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">5</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">6</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">7</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">8</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">9</div>
+
+                        <div className="py-3 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 cursor-not-allowed">
+                            10
+                            <br />
+                            <span className="text-[8px]">Hết lịch</span>
+                        </div>
+
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">11</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">12</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">13</div>
+
+                        <div className="py-3 bg-primary text-white rounded-lg font-medium shadow-md shadow-primary/20">
+                            28
+                            <br />
+                            <span className="text-[8px]">Đang chọn</span>
+                        </div>
+
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">15</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">16</div>
+                        <div className="py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer font-medium">17</div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-center gap-6 mt-8">
+                        <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 rounded-full bg-primary"></div>
+                            <span className="text-[10px] text-slate-500">Ngày có thể đặt lịch khám</span>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 rounded-full bg-slate-100 border border-slate-200"></div>
+                            <span className="text-[10px] text-slate-500">Ngày không thể đặt lịch khám</span>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <span className="text-[10px] text-slate-500">Ngày nghỉ lễ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center space-x-2 mb-6">
+                    <span className="material-icons text-primary">schedule</span>
+                    <h4 className="font-bold">Chọn giờ khám</h4>
+                </div>
+
+                <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex mb-6">
+                    <button className="flex-1 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 shadow-sm text-primary">
+                    Buổi sáng
+                    </button>
+                    <button className="flex-1 py-2 rounded-lg text-sm font-semibold text-slate-500">
+                    Buổi chiều
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                    <button className="border-2 border-primary bg-primary/5 py-4 rounded-xl text-center transition-all">
+                    <span className="text-sm font-bold text-primary block">08:00 -</span>
+                    <span className="text-sm font-bold text-primary block">09:00</span>
+                    </button>
+
+                    <button className="bg-slate-50 dark:bg-slate-800/50 py-4 rounded-xl text-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                    <span className="text-sm font-bold text-slate-600 dark:text-slate-400 block">09:00 -</span>
+                    <span className="text-sm font-bold text-slate-600 dark:text-slate-400 block">10:00</span>
+                    </button>
+
+                    <button className="bg-slate-50 dark:bg-slate-800/50 py-4 rounded-xl text-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                    <span className="text-sm font-bold text-slate-600 dark:text-slate-400 block">10:00 -</span>
+                    <span className="text-sm font-bold text-slate-600 dark:text-slate-400 block">11:00</span>
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center space-x-2 mb-6">
+                    <span className="material-icons text-primary">info</span>
+                    <h4 className="font-bold">Thông tin bổ sung (không bắt buộc)</h4>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl p-8 text-center">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto leading-relaxed">
+                    Bạn có thể cung cấp thêm các thông tin như lý do khám, triệu chứng, đơn thuốc sử dụng gần đây.
+                    </p>
+
+                    <button className="text-primary font-bold text-sm flex items-center justify-center mx-auto hover:underline">
+                    Tôi muốn gửi thêm thông tin
+                    <span className="material-icons ml-1 text-sm">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+            <div className="pt-4">
+                <button className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all transform hover:scale-[1.01] active:scale-[0.99]">
+                Tiếp tục
+                </button>
+            </div>
+            </div>
+        </div>
+        </main>
+    );
+}
+export default Appointment;

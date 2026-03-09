@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 function DoctorAppointment() {
   interface Doctor {
@@ -16,6 +18,7 @@ function DoctorAppointment() {
       id: string;
       name: string;
     };
+    
   }
   interface TimeSlot {
     id: string;
@@ -55,6 +58,8 @@ function DoctorAppointment() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [schedules, setSchedules] = useState<Record<string, TimeSlot[]>>({});
 
+  const navigate = useNavigate();
+
   const [filters, setFilters] = useState({
     specialty: "ALL",        // ALL | Hô hấp | Tim mạch | Nhi khoa
     gender: "ALL",           // ALL | MALE | FEMALE
@@ -77,7 +82,7 @@ function DoctorAppointment() {
     const fetchDoctors = async () => {
       const res = await fetch(
         // `http://localhost:3000/doctors?page=${page}&limit=5`
-        `http://localhost:3000/public/doctors?page=${page}&limit=10`,
+        `https://dutu-pulmo-be.onrender.com/public/doctors?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -125,7 +130,7 @@ function DoctorAppointment() {
       await Promise.all(
         doctors.map(async (doctor) => {
           const res = await fetch(
-            `http://localhost:3000/public/doctors/${doctor.id}/time-slots`
+            `https://dutu-pulmo-be.onrender.com/public/doctors/${doctor.id}/time-slots`
           );
 
           const json = await res.json();
@@ -494,7 +499,15 @@ function DoctorAppointment() {
                       <span className="material-symbols-outlined">videocam</span>
                       Tư vấn
                   </button>
-                  <button className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl">
+                  <button className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl"
+                  onClick={() =>
+                    navigate("/appointment", {
+                      state: {
+                        doctorId: doctor.id,
+                      },
+                    })
+                  }
+                  >
                       <span className="material-symbols-outlined">
                       event_available
                       </span>

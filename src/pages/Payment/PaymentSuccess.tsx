@@ -1,0 +1,417 @@
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import type { Doctor } from "../../types/doctor";
+import type { UserProfile } from "../../types/user";
+import type { TimeSlot } from "../../components/appointment/TimeSlotSection";
+
+interface AppointmentResponse {
+  id: string;
+  appointmentCode?: string;
+  qrCode?: string;
+  status?: string;
+}
+
+interface PaymentSuccessState {
+  appointment?: AppointmentResponse;
+  doctor: Doctor;
+  user: UserProfile;
+  selectedDate: string;
+  selectedSlot: TimeSlot;
+}
+
+function formatDateTimeNow() {
+  return new Intl.DateTimeFormat("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date());
+}
+
+function formatAppointmentDate(dateString?: string) {
+  if (!dateString) return "--";
+  const date = new Date(dateString);
+
+  const weekday = new Intl.DateTimeFormat("vi-VN", {
+    weekday: "long",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(date);
+
+  const datePart = new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(date);
+
+  return `${weekday}, ${datePart}`;
+}
+
+function formatBirthDate(dateString?: string) {
+  if (!dateString) return "--";
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(dateString));
+}
+
+function formatGender(gender?: string) {
+  if (!gender) return "--";
+
+  const value = gender.toLowerCase();
+  if (value === "male") return "Nam";
+  if (value === "female") return "Nữ";
+  return gender;
+}
+
+function formatVietnamTime(dateString?: string) {
+  if (!dateString) return "--";
+  return new Intl.DateTimeFormat("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(new Date(dateString));
+}
+
+function getDoctorName(doctor?: Doctor) {
+  if (!doctor) return "--";
+  return doctor.fullName || "--";
+}
+
+function getDoctorAvatar(doctor?: Doctor) {
+  return (
+    doctor?.avatarUrl ||
+    "https://via.placeholder.com/150?text=Doctor"
+  );
+}
+
+function getPatientPhone(user?: UserProfile) {
+  return user?.phone || "--";
+}
+
+function getPatientName(user?: UserProfile) {
+  return user?.fullName || "--";
+}
+
+function getPatientDob(user?: UserProfile) {
+  return user?.dateOfBirth || undefined;
+}
+
+function getPatientGender(user?: UserProfile) {
+  return user?.gender || "--";
+}
+
+function getAppointmentCode(appointment?: AppointmentResponse) {
+  return appointment?.appointmentCode || appointment?.id || "--";
+}
+
+export default function PaymentSuccess() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+//   const state = location.state as PaymentSuccessState | null;
+  const savedState = localStorage.getItem("payment_success_context");
+
+  const state =
+  (location.state as PaymentSuccessState | null) ||
+  (savedState ? (JSON.parse(savedState) as PaymentSuccessState) : null);
+  const code = searchParams.get("code");
+  const status = searchParams.get("status");
+  const cancel = searchParams.get("cancel");
+  const paymentId = searchParams.get("id");
+  const orderCode = searchParams.get("orderCode");
+
+  const isPaid =
+    code === "00" && status === "PAID" && cancel === "false";
+
+  if (!state) {
+    return (
+      <main className="flex-grow flex items-center justify-center p-6 md:p-12">
+        <div className="max-w-xl w-full bg-white rounded-2xl border border-slate-200 p-8 text-center">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="material-icons-round text-green-500 text-5xl">
+              check_circle
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-green-600 mb-2">
+            {isPaid ? "Thanh toán thành công" : "Trạng thái thanh toán"}
+          </h2>
+
+          <p className="text-slate-500 text-sm mb-6">
+            {formatDateTimeNow()}
+          </p>
+
+          <div className="bg-slate-50 rounded-xl p-4 text-left space-y-3 mb-6">
+            <div className="flex justify-between">
+              <span className="text-slate-500">Payment ID</span>
+              <span className="font-medium">{paymentId || "--"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Order code</span>
+              <span className="font-medium">{orderCode || "--"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Status</span>
+              <span className="font-medium">{status || "--"}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate("/")}
+            className="bg-primary text-white py-3 px-6 rounded-xl font-bold"
+          >
+            Về trang chủ
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  const { appointment, doctor, user, selectedDate, selectedSlot } = state;
+
+  const doctorName = getDoctorName(doctor);
+  const doctorAvatar = getDoctorAvatar(doctor);
+  const patientName = getPatientName(user);
+  const patientPhone = getPatientPhone(user);
+  const patientDob = formatBirthDate(getPatientDob(user));
+  const patientGender = formatGender(getPatientGender(user));
+  const appointmentCode = getAppointmentCode(appointment);
+  const appointmentDate = formatAppointmentDate(selectedDate);
+  const slotTime = `${formatVietnamTime(selectedSlot?.startTime)} - ${formatVietnamTime(
+    selectedSlot?.endTime
+  )}`;
+
+  const qrImage =
+    appointment?.qrCode ||
+    "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+      encodeURIComponent(appointmentCode);
+
+  const handleCopy = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      alert("Đã sao chép");
+    } catch {
+      alert("Không thể sao chép");
+    }
+  };
+
+  return (
+    <main className="flex-grow flex items-center justify-center p-6 md:p-12">
+      <div className="max-w-2xl w-full flex flex-col items-center">
+        <div className="flex flex-col items-center mb-8 text-center">
+          <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
+            <span className="material-icons-round text-green-500 text-5xl">
+              check_circle
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
+            {isPaid ? "Thanh toán thành công" : "Đã đặt lịch thành công"}
+          </h2>
+
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            {formatDateTimeNow()}
+          </p>
+        </div>
+
+        <div className="bg-card-light dark:bg-card-dark w-full ticket-shadow rounded-2xl overflow-hidden">
+          <div className="p-10 flex flex-col items-center bg-slate-50/50 dark:bg-white/5 border-b border-dashed border-slate-200 dark:border-slate-700">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+              <img
+                alt="QR Code for appointment check-in"
+                className="w-40 h-40"
+                src={qrImage}
+              />
+            </div>
+            <p className="mt-4 text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500">
+              Mã QR Check-in tại quầy
+            </p>
+          </div>
+
+          <div className="p-8 md:p-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <img
+                    alt={doctorName}
+                    className="w-16 h-16 rounded-full object-cover ring-4 ring-primary/10"
+                    src={doctorAvatar}
+                  />
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                      Bác sĩ
+                    </p>
+                    <p className="text-lg font-bold text-primary">
+                      {doctorName}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      {doctor?.specialty || ""}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
+                      Mã lịch khám
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-200">
+                        {appointmentCode}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(appointmentCode)}
+                        className="text-slate-400 hover:text-primary transition-colors"
+                      >
+                        <span className="material-icons-round text-[18px]">
+                          content_copy
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
+                      Ngày khám
+                    </p>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">
+                      {appointmentDate}
+                    </span>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
+                      Giờ khám
+                    </p>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">
+                      {slotTime}
+                    </span>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
+                      Trạng thái thanh toán
+                    </p>
+                    <span className="font-semibold text-green-600">
+                      {status || appointment?.status || (isPaid ? "PAID" : "--")}
+                    </span>
+                  </div>
+
+                  {orderCode ? (
+                    <div>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
+                        Order code
+                      </p>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200">
+                        {orderCode}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                      Thông tin bệnh nhân
+                    </h3>
+                    <span className="material-icons-round text-slate-300 text-sm">
+                      expand_less
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-baseline gap-4">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                        Họ và tên
+                      </span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200 text-right">
+                        {patientName}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-baseline gap-4">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                        Ngày sinh
+                      </span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200 text-right">
+                        {patientDob}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-baseline gap-4">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                        Giới tính
+                      </span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200 text-right">
+                        {patientGender}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-baseline gap-4">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                        Số điện thoại
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                          {patientPhone}
+                        </span>
+                        {patientPhone !== "--" && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(patientPhone)}
+                            className="text-slate-400 hover:text-primary transition-colors"
+                          >
+                            <span className="material-icons-round text-[16px]">
+                              content_copy
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 text-center">
+              <button
+                type="button"
+                onClick={() => navigate("/lich-kham")}
+                className="text-primary font-semibold text-sm hover:underline underline-offset-4 decoration-2"
+              >
+                Xem chi tiết lịch khám
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="flex-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 py-4 px-6 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+          >
+            Về trang chủ
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/chat")}
+            className="flex-1 bg-primary text-white py-4 px-6 rounded-xl font-bold shadow-lg shadow-primary/25 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <span className="material-icons-round text-xl">chat_bubble</span>
+            Chat với bác sĩ
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}

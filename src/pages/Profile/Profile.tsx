@@ -135,7 +135,7 @@ function Profile() {
   //     .catch(console.error);
   // }, []);
   useEffect(() => {
-    fetch("http://localhost:3000/enums/countries?page=1&limit=1")
+    fetch("https://dutu-pulmo-be.onrender.com/enums/countries?page=1&limit=1")
       .then(res => res.json())
       .then(res => {
         setCountries(res.data?.items ?? []);
@@ -151,7 +151,7 @@ function Profile() {
   //     .catch(console.error);
   // }, []);
   useEffect(() => {
-    fetch("http://localhost:3000/enums/ethnicities?page=1&limit=10")
+    fetch("https://dutu-pulmo-be.onrender.com/enums/ethnicities?page=1&limit=10")
       .then(res => res.json())
       .then(res => {
         setEthnicities(res.data?.items ?? []);
@@ -204,8 +204,8 @@ function Profile() {
     const keyword = inputValue.trim();
 
     const url = keyword
-      ? `http://localhost:3000/enums/occupations?limit=20&search=${encodeURIComponent(keyword)}`
-      : `http://localhost:3000/enums/occupations?limit=20`;
+      ? `https://dutu-pulmo-be.onrender.com/enums/occupations?limit=20&search=${encodeURIComponent(keyword)}`
+      : `https://dutu-pulmo-be.onrender.com/enums/occupations?limit=20`;
 
     const res = await fetch(url);
     const json = await res.json();
@@ -224,7 +224,7 @@ function Profile() {
       const token = localStorage.getItem("accessToken");
       if (!token) return;
 
-      const res = await fetch("http://localhost:3000/users/me", {
+      const res = await fetch("https://dutu-pulmo-be.onrender.com/users/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -272,7 +272,7 @@ function Profile() {
       if (user.occupation) {
         try {
           const resOcc = await fetch(
-            `http://localhost:3000/enums/occupations/${user.occupation}`
+            `https://dutu-pulmo-be.onrender.com/enums/occupations/${user.occupation}`
           );
           const occJson = await resOcc.json();
 
@@ -319,7 +319,7 @@ function Profile() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("http://localhost:3000/upload/avatar", {
+    const res = await fetch("https://dutu-pulmo-be.onrender.com/users/me/avatar", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -361,7 +361,7 @@ function Profile() {
 
       };
 
-      const res = await fetch(`http://localhost:3000/users/${user.id}`, {
+      const res = await fetch(`https://dutu-pulmo-be.onrender.com/users/${user.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

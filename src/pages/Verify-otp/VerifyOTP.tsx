@@ -33,7 +33,7 @@ function VerifyOTP() {
         try {
             setLoading(true);
 
-            await axios.post("http://localhost:3000/auth/resend-otp", {
+            await axios.post("https://dutu-pulmo-be.onrender.com/auth/resend-otp", {
             email,
             });
 
@@ -64,7 +64,7 @@ function VerifyOTP() {
         try {
         setLoading(true);
 
-        await axios.post("http://localhost:3000/auth/verify-otp", {
+        await axios.post("https://dutu-pulmo-be.onrender.com/auth/verify-otp", {
             email,
             otp: otpCode,
         });
