@@ -14,6 +14,8 @@ import { useEffect } from 'react'
 import AppointmentConfirm from './pages/Appointment/AppointmentConfirm'
 import AppointmentSuccess from './pages/Appointment/AppointmentSuccess'
 import PaymentSuccess from './pages/Payment/PaymentSuccess'
+import AppointmentSchedule from './pages/Appointment-Schedule/Appointment-Schedule'
+import AppointmentScheduleDetail from './pages/Appointment-Schedule/Appointment-Schedule-Detail'
 function App() {
 
   useEffect(() => {
@@ -38,6 +40,8 @@ function App() {
           <Route path="/appointment-confirm" element={<AppointmentConfirm/>} />
           <Route path="/appointment-success" element={<AppointmentSuccess/>} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/appointment-schedule" element={<AppointmentSchedule />} />
+          <Route path="/appointment-schedule/:id" element={<AppointmentScheduleDetail />} />
         </Route>
 
       </Routes>

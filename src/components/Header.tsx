@@ -27,7 +27,7 @@ function Header() {
           </Link>
 
           <Link
-            to="/appointments"
+            to="/appointment-schedule"
             className="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors py-5"
           >
             Lịch khám
