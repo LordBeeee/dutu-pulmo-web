@@ -16,12 +16,15 @@ export const TypingEffect: React.FC<TypingEffectProps> = ({
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
-    let index = 0;
     setDisplayedText('');
-    
+
+    // Dùng spread [...text] thay vì charAt để handle đúng emoji 4-byte (surrogate pairs)
+    const chars = [...text];
+    let index = 0;
+
     const timer = setInterval(() => {
-      if (index < text.length) {
-        setDisplayedText((prev) => prev + text.charAt(index));
+      if (index < chars.length) {
+        setDisplayedText((prev) => prev + chars[index]);
         index++;
       } else {
         clearInterval(timer);
@@ -32,5 +35,15 @@ export const TypingEffect: React.FC<TypingEffectProps> = ({
     return () => clearInterval(timer);
   }, [text, speed, onComplete]);
 
-  return <span className={className}>{displayedText}</span>;
+  // Render với \n -> <br/> để xuống dòng đúng
+  return (
+    <span className={className}>
+      {displayedText.split('\n').map((line, i, arr) => (
+        <React.Fragment key={i}>
+          {line}
+          {i < arr.length - 1 && <br />}
+        </React.Fragment>
+      ))}
+    </span>
+  );
 };
