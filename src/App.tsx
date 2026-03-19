@@ -89,6 +89,7 @@ function App() {
             <Route path="/appointment-confirm" element={<AppointmentConfirm />} />
             <Route path="/appointment-success" element={<AppointmentSuccess />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/return" element={<PaymentSuccess />} />
             <Route path="/appointment-schedule" element={<AppointmentSchedule />} />
             <Route path="/appointment-schedule/:id" element={<AppointmentScheduleDetail />} />
             <Route path="/doctor" element={<Doctor />} />

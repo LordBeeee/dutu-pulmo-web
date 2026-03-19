@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type { Doctor } from "../../types/doctor";
@@ -126,20 +127,40 @@ export default function PaymentSuccess() {
   const paymentId = searchParams.get("id");
   const orderCode = searchParams.get("orderCode");
 
+  const appointmentIdFromUrl = searchParams.get("appointmentId");
+
+  useEffect(() => {
+    // Clear context after reading to prevent stale data on future visits
+    localStorage.removeItem("payment_success_context");
+    localStorage.removeItem("currentAppointmentId");
+  }, []);
+
   const isPaid =
-    code === "00" && status === "PAID" && cancel === "false";
+    code === "00" && status === "PAID" && (cancel === "false" || !cancel);
+  const isCancelled = cancel === "true" || status === "CANCELLED";
+  const isFailed = !isPaid && !isCancelled && code !== null;
 
   if (!state) {
     return (
       <main className="flex-grow flex items-center justify-center p-6 md:p-12">
         <div className="max-w-xl w-full bg-white rounded-2xl border border-slate-200 p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="material-icons-round text-green-500 text-5xl">
-              check_circle
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+            isPaid ? "bg-green-100 text-green-500" : 
+            isCancelled ? "bg-amber-100 text-amber-500" : 
+            isFailed ? "bg-red-100 text-red-500" :
+            "bg-slate-100 text-slate-500"
+          }`}>
+            <span className="material-icons-round text-5xl">
+              {isPaid ? "check_circle" : isCancelled ? "info" : isFailed ? "error" : "help_outline"}
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-green-600 mb-2">
-            {isPaid ? "Thanh toán thành công" : "Trạng thái thanh toán"}
+          <h2 className={`text-2xl font-bold mb-2 ${
+            isPaid ? "text-green-600" : 
+            isCancelled ? "text-amber-600" : 
+            isFailed ? "text-red-600" :
+            "text-slate-600"
+          }`}>
+            {isPaid ? "Thanh toán thành công" : isCancelled ? "Đã hủy thanh toán" : isFailed ? "Thanh toán thất bại" : "Trạng thái thanh toán"}
           </h2>
 
           <p className="text-slate-500 text-sm mb-6">
@@ -152,8 +173,12 @@ export default function PaymentSuccess() {
               <span className="font-medium">{paymentId || "--"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Order code</span>
-              <span className="font-medium">{orderCode || "--"}</span>
+              <span className="text-slate-500">
+                {appointmentIdFromUrl ? "Appointment ID" : "Order code"}
+              </span>
+              <span className="font-medium">
+                {appointmentIdFromUrl || orderCode || "--"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Status</span>
@@ -213,14 +238,24 @@ export default function PaymentSuccess() {
     <main className="flex-grow flex items-center justify-center p-6 md:p-12">
       <div className="max-w-2xl w-full flex flex-col items-center">
         <div className="flex flex-col items-center mb-8 text-center">
-          <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
-            <span className="material-icons-round text-green-500 text-5xl">
-              check_circle
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
+            isPaid ? "bg-green-100 dark:bg-green-900/30 text-green-500" : 
+            isCancelled ? "bg-amber-100 dark:bg-amber-900/30 text-amber-500" : 
+            isFailed ? "bg-red-100 dark:bg-red-900/30 text-red-500" :
+            "bg-slate-100 dark:bg-slate-800/30 text-slate-500"
+          }`}>
+            <span className="material-icons-round text-5xl">
+              {isPaid ? "check_circle" : isCancelled ? "info" : isFailed ? "error" : "help_outline"}
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
-            {isPaid ? "Thanh toán thành công" : "Đã đặt lịch thành công"}
+          <h2 className={`text-2xl font-bold mb-1 ${
+            isPaid ? "text-green-600 dark:text-green-400" : 
+            isCancelled ? "text-amber-600 dark:text-amber-400" : 
+            isFailed ? "text-red-600 dark:text-red-400" :
+            "text-slate-600 dark:text-slate-400"
+          }`}>
+            {isPaid ? "Thanh toán thành công" : isCancelled ? "Đã hủy thanh toán" : isFailed ? "Thanh toán thất bại" : "Trạng thái thanh toán"}
           </h2>
 
           <p className="text-slate-500 dark:text-slate-400 text-sm">
@@ -307,18 +342,23 @@ export default function PaymentSuccess() {
                     <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
                       Trạng thái thanh toán
                     </p>
-                    <span className="font-semibold text-green-600">
-                      {status || appointment?.status || (isPaid ? "PAID" : "--")}
+                    <span className={`font-semibold ${
+                      isPaid ? "text-green-600" : 
+                      isCancelled ? "text-amber-600" : 
+                      isFailed ? "text-red-600" :
+                      "text-slate-600"
+                    }`}>
+                      {status || (isPaid ? "PAID" : isCancelled ? "CANCELLED" : isFailed ? "FAILED" : "--")}
                     </span>
                   </div>
 
-                  {orderCode ? (
+                  {appointmentIdFromUrl || orderCode ? (
                     <div>
                       <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
-                        Order code
+                        {appointmentIdFromUrl ? "Appointment ID" : "Order code"}
                       </p>
                       <span className="font-semibold text-slate-700 dark:text-slate-200">
-                        {orderCode}
+                        {appointmentIdFromUrl || orderCode}
                       </span>
                     </div>
                   ) : null}
