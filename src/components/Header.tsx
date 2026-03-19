@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/auth.store';
 function Header() {
   const user = useAuthStore((state) => state.user);
 
-  const fullName = user?.fullName || 'Ngu?i dùng';
+  const fullName = user?.fullName || 'Người dùng';
   const avatarUrl = user?.avatarUrl || '/src/assets/default-avatar.png';
 
   return (
@@ -52,7 +52,7 @@ function Header() {
             </span>
             <input
               type="text"
-              placeholder="Tìm bác si, chuyên khoa..."
+              placeholder="Tìm bác sĩ, chuyên khoa..."
               className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20"
             />
           </div>
