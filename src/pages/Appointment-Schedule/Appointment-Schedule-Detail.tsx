@@ -1,612 +1,235 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+﻿import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-interface AppointmentDetail {
-  id: string;
-  appointmentNumber?: string;
-  scheduledAt?: string;
-  status: string;
-  appointmentType?: string;
-  subType?: string;
-  sourceType?: string;
-  durationMinutes?: number;
-  chiefComplaint?: string;
-  patientNotes?: string;
-  doctorNotes?: string;
-  symptoms?: string[];
-  feeAmount?: string;
-  paidAmount?: string;
-  refunded?: boolean;
-  timezone?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  meetingUrl?: string;
-  queueNumber?: number;
-  cancellationReason?: string;
-  cancelledAt?: string;
+import CancelAppointmentModal from '@/components/appointments/CancelAppointmentModal';
+import {
+  canCancelAppointmentByStatus,
+  getAppointmentStatusConfig,
+  getAppointmentTypeLabel,
+} from '@/constants/appointment-status';
+import { useAppointmentDetail, useCancelAppointment } from '@/hooks/use-appointments';
 
-  doctor?: {
-    id?: string;
-    fullName?: string;
-    avatarUrl?: string;
-    specialty?: string;
-    title?: string;
-    phone?: string;
-    email?: string;
-  };
+function formatDate(date?: string) {
+  if (!date) return '---';
+  return new Date(date).toLocaleDateString('vi-VN');
+}
 
-  patient?: {
-    id?: string;
-    profileCode?: string;
-    user?: {
-      fullName?: string;
-      phone?: string;
-      email?: string;
-      gender?: string;
-      dateOfBirth?: string;
-    };
-  };
+function formatTime(date?: string) {
+  if (!date) return '---';
+  return new Date(date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatMoney(value?: string) {
+  if (!value) return '---';
+  return `${Number(value).toLocaleString('vi-VN')} VND`;
+}
+
+function sanitizeRichText(html: string): string {
+  if (!html) return '';
+
+  const parser = new DOMParser();
+  const document = parser.parseFromString(html, 'text/html');
+
+  document.querySelectorAll('script, style, iframe, object, embed').forEach((node) => node.remove());
+
+  document.querySelectorAll('*').forEach((element) => {
+    [...element.attributes].forEach((attribute) => {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value.trim().toLowerCase();
+
+      if (name.startsWith('on') || value.startsWith('javascript:')) {
+        element.removeAttribute(attribute.name);
+      }
+    });
+  });
+
+  return document.body.innerHTML;
+}
+
+function renderPatientNotes(notes?: string) {
+  if (!notes) {
+    return <p className="font-medium text-slate-900">---</p>;
+  }
+
+  const trimmed = notes.trim();
+  const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(trimmed);
+
+  if (!looksLikeHtml) {
+    return <p className="font-medium text-slate-900 whitespace-pre-line">{trimmed}</p>;
+  }
+
+  return (
+    <div
+      className="prose prose-sm max-w-none text-slate-900 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0"
+      dangerouslySetInnerHTML={{ __html: sanitizeRichText(trimmed) }}
+    />
+  );
 }
 
 const AppointmentScheduleDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [appointment, setAppointment] = useState<AppointmentDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [cancelLoading, setCancelLoading] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const fetchAppointmentDetail = async () => {
+  const appointmentQuery = useAppointmentDetail(id);
+  const cancelAppointmentMutation = useCancelAppointment();
+
+  const appointment = appointmentQuery.data ?? null;
+  const statusConfig = getAppointmentStatusConfig(appointment?.status);
+
+  const canCancel = canCancelAppointmentByStatus(appointment?.status);
+  const canJoinVideo =
+    !!appointment?.meetingUrl && ['CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS'].includes(appointment.status);
+
+  const symptomsText = !appointment?.symptoms || appointment.symptoms.length === 0 ? '---' : appointment.symptoms.join(', ');
+
+  const handleConfirmCancel = async (reason: string) => {
+    if (!appointment) return;
+
     try {
-      setLoading(true);
-      setError("");
-
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        throw new Error("Không tìm thấy access token");
-      }
-
-      const res = await fetch(
-        `https://dutu-pulmo-be.onrender.com/appointments/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const response = await res.json();
-      console.log("appointment detail response:", response);
-
-      if (!res.ok) {
-        throw new Error(
-          response?.message || `HTTP ${res.status} - ${res.statusText}`
-        );
-      }
-
-      setAppointment(response?.data ?? null);
-    } catch (err) {
-      console.error("Fetch appointment detail error:", err);
-      setError("Không thể tải chi tiết lịch khám.");
-    } finally {
-      setLoading(false);
+      await cancelAppointmentMutation.mutateAsync({
+        appointmentId: appointment.id,
+        payload: { reason },
+      });
+      setShowCancelModal(false);
+      await appointmentQuery.refetch();
+    } catch {
+      // Keep quiet, UI retry is available.
     }
   };
 
-  useEffect(() => {
-    if (id) {
-      fetchAppointmentDetail();
-    }
-  }, [id]);
-
-  const formatDateTime = (date?: string) => {
-    if (!date) return "---";
-    return new Date(date).toLocaleString("vi-VN");
-  };
-
-  const formatDateOnly = (date?: string) => {
-    if (!date) return "---";
-    return new Date(date).toLocaleDateString("vi-VN");
-  };
-
-  const formatTimeOnly = (date?: string) => {
-    if (!date) return "---";
-    return new Date(date).toLocaleTimeString("vi-VN");
-  };
-
-  const formatMoney = (value?: string) => {
-    if (!value) return "---";
-    return Number(value).toLocaleString("vi-VN") + " VNĐ";
-  };
-
-  const getStatusLabel = (status?: string) => {
-    switch (status) {
-      case "CONFIRMED":
-        return "Đã xác nhận";
-      case "CANCELLED":
-        return "Đã hủy";
-      case "PENDING_PAYMENT":
-        return "Chờ thanh toán";
-      case "PENDING":
-        return "Chờ xác nhận";
-      case "CHECKED_IN":
-        return "Đã check-in";
-      case "IN_PROGRESS":
-        return "Đang khám";
-      case "COMPLETED":
-        return "Hoàn thành";
-      case "RESCHEDULED":
-        return "Đã dời lịch";
-      default:
-        return status || "---";
-    }
-  };
-
-  const getStatusClass = (status?: string) => {
-    switch (status) {
-      case "CONFIRMED":
-        return "bg-emerald-100 text-emerald-700";
-      case "CANCELLED":
-        return "bg-red-100 text-red-700";
-      case "PENDING_PAYMENT":
-        return "bg-yellow-100 text-yellow-700";
-      case "PENDING":
-        return "bg-blue-100 text-blue-700";
-      case "CHECKED_IN":
-        return "bg-purple-100 text-purple-700";
-      case "IN_PROGRESS":
-        return "bg-indigo-100 text-indigo-700";
-      case "COMPLETED":
-        return "bg-green-100 text-green-700";
-      case "RESCHEDULED":
-        return "bg-orange-100 text-orange-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  const getAppointmentTypeLabel = (type?: string) => {
-    switch (type) {
-      case "VIDEO":
-        return "Khám video";
-      case "IN_CLINIC":
-        return "Khám tại phòng khám";
-      case "ONLINE":
-        return "Khám online";
-      default:
-        return type || "---";
-    }
-  };
-
-  const getPaymentStatus = () => {
-    const fee = Number(appointment?.feeAmount || 0);
-    const paid = Number(appointment?.paidAmount || 0);
-
-    if (paid > 0 && paid >= fee) return "Đã thanh toán";
-    if (paid > 0 && paid < fee) return "Thanh toán một phần";
-    return "Chưa thanh toán";
-  };
-
-  const getPaymentClass = () => {
-    const fee = Number(appointment?.feeAmount || 0);
-    const paid = Number(appointment?.paidAmount || 0);
-
-    if (paid > 0 && paid >= fee) return "bg-green-100 text-green-700";
-    if (paid > 0 && paid < fee) return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
-  };
-
-  const canCancelAppointment = () => {
-    if (!appointment) return false;
-    return ["PENDING", "PENDING_PAYMENT", "CONFIRMED"].includes(
-      appointment.status
-    );
-  };
-
-  const getDoctorInitial = () => {
-    const name = appointment?.doctor?.fullName?.trim();
-    if (!name) return "B";
-    return name.charAt(0).toUpperCase();
-  };
-
-  const handleCancelAppointment = async () => {
-  if (!appointment) return;
-
-  const confirmed = window.confirm("Bạn có chắc muốn hủy lịch khám này không?");
-  if (!confirmed) return;
-
-  const reason = window.prompt("Nhập lý do hủy lịch khám:", "") || "Người dùng hủy lịch khám";
-
-  try {
-    setCancelLoading(true);
-
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      throw new Error("Không tìm thấy access token");
-    }
-
-    const res = await fetch(
-      `https://dutu-pulmo-be.onrender.com/appointments/${appointment.id}/cancel`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ reason }),
-      }
-    );
-
-    const response = await res.json().catch(() => null);
-    console.log("cancel appointment response:", response);
-
-    if (!res.ok) {
-      throw new Error(
-        response?.message || `HTTP ${res.status} - ${res.statusText}`
-      );
-    }
-
-    alert("Hủy lịch khám thành công.");
-    fetchAppointmentDetail();
-  } catch (err) {
-    console.error("Cancel appointment error:", err);
-    alert("Không thể hủy lịch khám. Vui lòng thử lại.");
-  } finally {
-    setCancelLoading(false);
-  }
-};
-
-  if (loading) {
+  if (appointmentQuery.isLoading) {
     return (
-      <main className="max-w-4xl mx-auto -mt-8 px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-          <p className="text-gray-600">Đang tải chi tiết lịch khám...</p>
-        </div>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="h-64 bg-slate-100 rounded-2xl animate-pulse" />
       </main>
     );
   }
 
-  if (error || !appointment) {
+  if (appointmentQuery.isError || !appointment) {
     return (
-      <main className="max-w-4xl mx-auto -mt-8 px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-          <p className="text-red-500 mb-4">
-            {error || "Không tìm thấy lịch khám"}
-          </p>
-          <button
-            onClick={() => navigate("/appointment-schedule")}
-            className="bg-primary text-white px-4 py-2 rounded-lg font-semibold"
-          >
-            Quay lại danh sách
-          </button>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl border border-red-200 p-8 text-center">
+          <p className="text-red-600">Không tìm thấy lịch khám hoặc đã có lỗi xảy ra.</p>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button type="button" onClick={() => void appointmentQuery.refetch()} className="px-4 py-2 rounded-xl border border-red-200 text-red-600 bg-red-50">
+              Thử lại
+            </button>
+            <button type="button" onClick={() => navigate('/appointment-schedule')} className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700">
+              Quay lại danh sách
+            </button>
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="max-w-4xl mx-auto -mt-8 px-4 sm:px-6 lg:px-8 pb-16">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 mt-7 bg-gray-50 border-b border-gray-100 flex justify-between items-center gap-4 flex-wrap ">
-          <span
-            className={`${getStatusClass(
-              appointment.status
-            )} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide`}
-          >
-            {getStatusLabel(appointment.status)}
-          </span>
-          <span className="text-sm text-gray-500">
-            Mã: #{appointment.appointmentNumber || appointment.id}
-          </span>
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+        <Link to="/" className="hover:text-primary">Trang chủ</Link>
+        <span className="material-symbols-outlined text-xs">chevron_right</span>
+        <Link to="/appointment-schedule" className="hover:text-primary">Lịch khám</Link>
+        <span className="material-symbols-outlined text-xs">chevron_right</span>
+        <span className="font-medium text-slate-900">Chi tiết lịch khám</span>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="p-5 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+          <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold border ${statusConfig.bgClass} ${statusConfig.textClass} ${statusConfig.borderClass}`}>
+            <span className="material-symbols-outlined text-sm">{statusConfig.icon}</span>
+            <span>{statusConfig.label}</span>
+          </div>
+          <span className="text-sm text-slate-500">Mã lịch: #{appointment.appointmentNumber || appointment.id}</span>
         </div>
 
-        <div className="p-6 sm:p-8 space-y-8">
-          <div className="flex items-center gap-6" data-purpose="doctor-profile">
-            {appointment.doctor?.avatarUrl ? (
-              <img
-                src={appointment.doctor.avatarUrl}
-                alt={appointment.doctor.fullName || "Doctor"}
-                className="w-20 h-20 rounded-full object-cover border"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold">
-                {getDoctorInitial()}
-              </div>
-            )}
-
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 uppercase">
-                {appointment.doctor?.fullName || "Chưa có tên bác sĩ"}
-              </h2>
-              <p className="text-blue-600 font-medium">
-                {appointment.doctor?.specialty || "Chưa có chuyên khoa"}
-              </p>
+        <div className="p-6 space-y-6">
+          <section>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">Thông tin lịch hẹn</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm">
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Ngày khám</span><span className="font-semibold text-slate-900">{formatDate(appointment.scheduledAt)}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Giờ khám</span><span className="font-semibold text-slate-900">{formatTime(appointment.scheduledAt)}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Hình thức</span><span className="font-semibold text-slate-900">{getAppointmentTypeLabel(appointment.appointmentType)}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Nguồn đặt lịch</span><span className="font-semibold text-slate-900">{appointment.sourceType || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Phí khám</span><span className="font-semibold text-slate-900">{formatMoney(appointment.feeAmount)}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Đã thanh toán</span><span className="font-semibold text-slate-900">{formatMoney(appointment.paidAmount)}</span></div>
             </div>
-          </div>
+          </section>
 
-          <hr className="border-gray-100" />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-            <div className="space-y-4">
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Bệnh nhân</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {appointment.patient?.user?.fullName || "---"}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Thời gian khám</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {formatTimeOnly(appointment.scheduledAt)}
-                  <br />
-                  {formatDateOnly(appointment.scheduledAt)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Hình thức</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {getAppointmentTypeLabel(appointment.appointmentType)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Thời lượng</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {appointment.durationMinutes
-                    ? `${appointment.durationMinutes} phút`
-                    : "---"}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Mã hồ sơ</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {appointment.patient?.profileCode || "---"}
-                </span>
-              </div>
+          <section>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">Thông tin bác sĩ và cơ sở</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm">
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Bác sĩ</span><span className="font-semibold text-slate-900 text-right">{appointment.doctor?.fullName || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Chuyên khoa</span><span className="font-semibold text-slate-900 text-right">{appointment.doctor?.specialty || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Cơ sở y tế</span><span className="font-semibold text-slate-900 text-right">{appointment.hospital?.name || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Liên hệ bác sĩ</span><span className="font-semibold text-slate-900 text-right">{appointment.doctor?.phone || appointment.doctor?.email || '---'}</span></div>
             </div>
+          </section>
 
-            <div className="space-y-4">
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Lý do/Triệu chứng</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {appointment.chiefComplaint ||
-                    (appointment.symptoms && appointment.symptoms.length > 0
-                      ? appointment.symptoms.join(", ")
-                      : "---")}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Phí khám</span>
-                <span className="font-bold text-blue-600 text-lg text-right">
-                  {formatMoney(appointment.feeAmount)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Thanh toán</span>
-                <span
-                  className={`${getPaymentClass()} px-2 py-0.5 rounded text-xs font-bold uppercase`}
-                >
-                  {getPaymentStatus()}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Đã thanh toán</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {formatMoney(appointment.paidAmount)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-gray-50 pb-2 gap-4">
-                <span className="text-gray-500 text-sm">Nguồn tạo</span>
-                <span className="font-semibold text-gray-900 text-right">
-                  {appointment.sourceType || "---"}
-                </span>
-              </div>
+          <section>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">Thông tin bệnh nhân</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm">
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Họ tên</span><span className="font-semibold text-slate-900 text-right">{appointment.patient?.user?.fullName || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Mã bệnh nhân</span><span className="font-semibold text-slate-900 text-right">{appointment.patient?.profileCode || appointment.patient?.id || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Điện thoại</span><span className="font-semibold text-slate-900 text-right">{appointment.patient?.user?.phone || '---'}</span></div>
+              <div className="flex justify-between border-b border-slate-100 py-2 gap-3"><span className="text-slate-500">Email</span><span className="font-semibold text-slate-900 text-right">{appointment.patient?.user?.email || '---'}</span></div>
             </div>
-          </div>
+          </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-2">
-                Thông tin bác sĩ
-              </h3>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="text-gray-500">Họ tên: </span>
-                  <span className="font-semibold">
-                    {appointment.doctor?.fullName || "---"}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500">Chuyên khoa: </span>
-                  <span className="font-semibold">
-                    {appointment.doctor?.specialty || "---"}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500">Email: </span>
-                  <span className="font-semibold">
-                    {appointment.doctor?.email || "---"}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500">Điện thoại: </span>
-                  <span className="font-semibold">
-                    {appointment.doctor?.phone || "---"}
-                  </span>
-                </p>
+          <section>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">Triệu chứng và ghi chú</h2>
+            <div className="rounded-xl border border-slate-200 p-4 space-y-3 text-sm">
+              <div>
+                <p className="text-slate-500 mb-1">Triệu chứng</p>
+                <p className="font-medium text-slate-900">{symptomsText}</p>
               </div>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-2">
-                Thông tin bệnh nhân
-              </h3>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="text-gray-500">Họ tên: </span>
-                  <span className="font-semibold">
-                    {appointment.patient?.user?.fullName || "---"}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500">Email: </span>
-                  <span className="font-semibold">
-                    {appointment.patient?.user?.email || "---"}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500">Điện thoại: </span>
-                  <span className="font-semibold">
-                    {appointment.patient?.user?.phone || "---"}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-500">Ngày sinh: </span>
-                  <span className="font-semibold">
-                    {formatDateOnly(appointment.patient?.user?.dateOfBirth)}
-                  </span>
-                </p>
+              <div>
+                <p className="text-slate-500 mb-1">Ghi chú bệnh nhân</p>
+                {renderPatientNotes(appointment.patientNotes)}
               </div>
+              {appointment.cancellationReason ? (
+                <div>
+                  <p className="text-slate-500 mb-1">Lý do hủy</p>
+                  <p className="font-medium text-red-600">{appointment.cancellationReason}</p>
+                </div>
+              ) : null}
             </div>
-          </div>
+          </section>
+        </div>
 
-          {(appointment.patientNotes ||
-            appointment.doctorNotes ||
-            appointment.cancellationReason) && (
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <h3 className="text-sm font-bold text-blue-800 mb-3 flex items-center gap-2">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  />
-                </svg>
-                Ghi chú
-              </h3>
+        <div className="p-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+          <button type="button" onClick={() => navigate('/appointment-schedule')} className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">
+            Quay lại danh sách
+          </button>
 
-              <div className="space-y-2 text-sm">
-                {appointment.patientNotes && (
-                  <p className="text-blue-700">
-                    <span className="font-semibold">Bệnh nhân: </span>
-                    {appointment.patientNotes}
-                  </p>
-                )}
-
-                {appointment.doctorNotes && (
-                  <p className="text-blue-700">
-                    <span className="font-semibold">Bác sĩ: </span>
-                    {appointment.doctorNotes}
-                  </p>
-                )}
-
-                {appointment.cancellationReason && (
-                  <p className="text-blue-700">
-                    <span className="font-semibold">Lý do hủy: </span>
-                    {appointment.cancellationReason}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 className="text-sm font-bold text-blue-800 mb-1 flex items-center gap-2">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
-              Lưu ý quan trọng
-            </h3>
-
-            <p className="text-sm text-blue-700">
-              Vui lòng có mặt tại phòng khám ít nhất 15 phút trước giờ hẹn. Mang
-              theo thẻ BHYT và các hồ sơ bệnh án cũ nếu có.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <button
-              onClick={() => navigate("/appointment-schedule")}
-              className="flex-1 bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
-              Quay lại
-            </button>
-
-            {canCancelAppointment() && (
-              <button
-                onClick={handleCancelAppointment}
-                disabled={cancelLoading}
-                className="flex-1 bg-red-50 text-red-600 border border-red-200 py-3 rounded-lg font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  />
-                </svg>
-                {cancelLoading ? "Đang hủy..." : "Hủy lịch khám"}
-              </button>
-            )}
-
-            {appointment.meetingUrl && appointment.appointmentType === "VIDEO" && (
-              <a
-                href={appointment.meetingUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 bg-primary text-white py-3 rounded-lg font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-2"
-              >
+          <div className="flex items-center gap-3">
+            {canJoinVideo ? (
+              <a href={appointment.meetingUrl} target="_blank" rel="noreferrer" className="px-4 py-2.5 rounded-xl border border-primary text-primary font-semibold hover:bg-primary/5">
                 Vào phòng khám
               </a>
-            )}
+            ) : null}
+
+            {canCancel ? (
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(true)}
+                disabled={cancelAppointmentMutation.isPending}
+                className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200 font-semibold hover:bg-red-100 disabled:opacity-60"
+              >
+                {cancelAppointmentMutation.isPending ? 'Đang hủy...' : 'Hủy lịch khám'}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
+
+      <CancelAppointmentModal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleConfirmCancel}
+        isPending={cancelAppointmentMutation.isPending}
+      />
     </main>
   );
 };

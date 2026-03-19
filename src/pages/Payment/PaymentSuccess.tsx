@@ -137,7 +137,6 @@ export default function PaymentSuccess() {
               check_circle
             </span>
           </div>
-
           <h2 className="text-2xl font-bold text-green-600 mb-2">
             {isPaid ? "Thanh toán thành công" : "Trạng thái thanh toán"}
           </h2>
@@ -384,7 +383,7 @@ export default function PaymentSuccess() {
             <div className="mt-10 text-center">
               <button
                 type="button"
-                onClick={() => navigate("/lich-kham")}
+                onClick={() => navigate("/appointment-schedule")}
                 className="text-primary font-semibold text-sm hover:underline underline-offset-4 decoration-2"
               >
                 Xem chi tiết lịch khám
@@ -415,3 +414,5 @@ export default function PaymentSuccess() {
     </main>
   );
 }
+
+

@@ -1,7 +1,7 @@
-﻿import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+﻿import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { AuthUser } from '@/types/auth.types';
+import type { AuthUser } from "@/types/auth.types";
 
 export type AuthState = {
   accessToken: string | null;
@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
       setHydrated: (value) => set({ hydrated: value }),
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

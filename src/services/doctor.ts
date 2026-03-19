@@ -59,11 +59,12 @@ export const doctorService = {
     doctorId: string,
     from: string,
     to: string,
+    appointmentType?: AppointmentTypeFilter,
   ): Promise<TimeSlotSummaryItem[]> => {
     const { data } = await api.get<TimeSlotSummaryItem[]>(
       `/public/doctors/${doctorId}/time-slots/summary`,
       {
-        params: { from, to },
+        params: cleanParams({ from, to, appointmentType }),
       },
     );
     return data;
@@ -72,11 +73,12 @@ export const doctorService = {
   getDoctorAvailableTimeSlots: async (
     doctorId: string,
     date: string,
+    appointmentType?: AppointmentTypeFilter,
   ): Promise<TimeSlotResponse[]> => {
     const { data } = await api.get<TimeSlotResponse[]>(
       `/public/doctors/${doctorId}/time-slots/available`,
       {
-        params: { date },
+        params: cleanParams({ date, appointmentType }),
       },
     );
     return data;

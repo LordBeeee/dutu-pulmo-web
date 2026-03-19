@@ -45,7 +45,7 @@ function HospitalsPage() {
 
     return hospitals.filter((item) => {
       const name = item.name.toLowerCase();
-      const isClinic = name.includes('phòng khám') || name.includes('phong kham');
+      const isClinic = name.includes('phòng khám');
       if (typeFilter === 'clinic') return isClinic;
       return !isClinic;
     });
