@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { DoctorDetail } from "../../../types/doctor";
 import { formatCurrency } from "../../../utils/doctor";
 
@@ -6,6 +7,7 @@ interface DoctorSidebarProps {
 }
 
 function DoctorSidebar({ doctor }: DoctorSidebarProps) {
+  const navigate = useNavigate();
   return (
     <aside className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sticky top-24">
@@ -23,7 +25,10 @@ function DoctorSidebar({ doctor }: DoctorSidebarProps) {
 
         <div className="space-y-4">
 
-          <button className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl">
+          <button
+            onClick={() => navigate('/appointment', { state: { doctorId: doctor.id } })}
+            className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-primary/20"
+          >
             Đặt lịch khám ngay
           </button>
         </div>

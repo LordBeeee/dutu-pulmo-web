@@ -14,7 +14,6 @@ import ChangePasswordPage from '@/pages/Change-password/ChangePassword'
 import ChatPage from '@/pages/Chat/Chat'
 import Doctor from '@/pages/Doctor/Doctor'
 import DoctorDetail from '@/pages/Doctor/Doctor-detail'
-import EditProfilePage from '@/pages/Edit-profile/EditProfile'
 import FavoritesPage from '@/pages/Favorites/Favorites'
 import ForgotPassword from '@/pages/Forgot-password/ForgotPassword'
 import Home from '@/pages/Home/Home'
@@ -109,7 +108,6 @@ function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
-            <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route path="/my-reviews" element={<MyReviewsPage />} />
             <Route path="/prescriptions" element={<PrescriptionsPage />} />
             <Route path="/prescriptions/:prescriptionId" element={<PrescriptionDetailPage />} />

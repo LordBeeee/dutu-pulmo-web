@@ -189,6 +189,8 @@ function Profile() {
       occupation: formData.occupation || null,
       provinceCode: formData.province || null,
       wardCode: formData.ward || null,
+      province: provinces.find((p) => String(p.code) === formData.province)?.name || null,
+      ward: wards.find((w) => String(w.code) === formData.ward)?.name || null,
       address: formData.address || null,
     }),
     [formData],
@@ -198,7 +200,7 @@ function Profile() {
     e.preventDefault();
 
     const userId = user?.id || profileQuery.data?.id;
-
+    console.log(payload);
     if (!userId) {
       toast.error('Không tìm thấy user id');
       return;
@@ -409,7 +411,7 @@ function Profile() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold">Đường</label>
+                <label className="text-sm font-semibold">Địa chỉ</label>
                 <textarea rows={3} className="w-full px-4 py-2.5 border rounded-xl shadow-none" name="address" value={formData.address} onChange={handleChange}></textarea>
               </div>
 
