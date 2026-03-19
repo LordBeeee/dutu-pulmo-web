@@ -27,6 +27,7 @@ import MedicalRecordsPage from '@/pages/Medical-records/MedicalRecords'
 import MyReviewsPage from '@/pages/My-reviews/MyReviews'
 import NewReportPage from '@/pages/Reports/NewReport'
 import NewsPage from '@/pages/News/News'
+import NewsDetail from '@/pages/News/NewsDetail'
 import NotificationsPage from '@/pages/Notifications/Notifications'
 import PaymentSuccess from '@/pages/Payment/PaymentSuccess'
 import PaymentPage from '@/pages/Payment/Payment'
@@ -98,6 +99,7 @@ function App() {
             <Route path="/chat/:chatroomId" element={<ChatRoomPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/hospitals" element={<HospitalsPage />} />
             <Route path="/hospitals/:id" element={<HospitalDetailPage />} />
             <Route path="/medical-records" element={<MedicalRecordsPage />} />
