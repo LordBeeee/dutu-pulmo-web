@@ -203,14 +203,14 @@ export const ChatPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6 h-screen overflow-hidden">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Tin nhắn trao đổi</h1>
         <p className="text-slate-500">Trao đổi trực tiếp với bác sĩ chuyên khoa</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-        <Card className="h-[calc(100vh-220px)] min-h-[560px] flex flex-col">
+        <Card className="h-full flex flex-col overflow-hidden">
           <CardHeader className="space-y-4 p-4 border-b">
             <CardTitle className="text-base font-semibold">Cuộc trò chuyện</CardTitle>
             <div className="relative">
@@ -262,7 +262,7 @@ export const ChatPage = () => {
             )}
           </CardHeader>
           <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-full">
+            <ScrollArea className="h-full hide-scrollbar scroll-lock">
               <div className="p-3 space-y-2">
                 {isLoadingRooms &&
                   Array.from({ length: 6 }).map((_, index) => (

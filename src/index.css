@@ -31,3 +31,24 @@ body {
     display: none;
     /* Chrome, Safari */
 }
+
+[data-radix-scroll-area-scrollbar] {
+    display: none !important;
+}
+
+[data-radix-scroll-area-thumb] {
+    display: none !important;
+}
+
+/* Ẩn scrollbar của viewport (CÁI QUAN TRỌNG NHẤT) */
+[data-radix-scroll-area-viewport] {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE */
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+    display: none;
+    /* Chrome */
+}
