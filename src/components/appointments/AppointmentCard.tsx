@@ -16,6 +16,7 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
   const navigate = useNavigate();
   const statusConfig = getAppointmentStatusConfig(appointment.status);
   const hospitalName = appointment.hospital?.name || 'Đang cập nhật cơ sở';
+  const isPendingPayment = appointment.status === 'PENDING_PAYMENT';
 
   const handleNavigate = () => {
     navigate(`/appointment-schedule/${appointment.id}`);
@@ -34,6 +35,28 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
         }
       }}
     >
+      {/* Thanh nhắc nhở PENDING_PAYMENT - thêm mới */}
+      {isPendingPayment && (
+        <div className="mb-4 -mx-5 -mt-5 px-5 py-3 bg-amber-50 border-b border-amber-100 flex items-center justify-between gap-3 rounded-t-2xl">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-amber-500 text-base">payments</span>
+            <p className="text-xs font-semibold text-amber-700">
+              Lịch khám chưa được thanh toán
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/payment?appointmentId=${appointment.id}`);
+            }}
+            className="shrink-0 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors"
+          >
+            Thanh toán ngay
+          </button>
+        </div>
+      )}
+
       <div className="flex justify-between items-start gap-3">
         <div className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold border ${statusConfig.bgClass} ${statusConfig.textClass} ${statusConfig.borderClass}`}>
           <span className="material-symbols-outlined text-sm">{statusConfig.icon}</span>
@@ -83,6 +106,21 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
         >
           Xem chi tiết
         </button>
+
+        {/* Nút thanh toán trong action row - thêm mới */}
+        {isPendingPayment && (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              navigate(`/payment?appointmentId=${appointment.id}`);
+            }}
+            className="flex-1 rounded-xl bg-amber-500 hover:bg-amber-600 py-2.5 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            <span className="material-symbols-outlined text-sm">payments</span>
+            Thanh toán
+          </button>
+        )}
 
         {appointment.appointmentType === 'VIDEO' && ['CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS'].includes(appointment.status) && (
           <button

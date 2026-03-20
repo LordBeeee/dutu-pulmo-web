@@ -20,7 +20,8 @@ import type { Doctor } from "@/types/doctor";
 function Appointment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const doctorId = location.state?.doctorId as string | undefined;
+  const state = location.state as any;
+  const doctorId = state?.doctorId as string | undefined;
 
   const doctorQuery = usePublicDoctorDetail(doctorId);
   const myPatientQuery = useMyPatient();
@@ -28,14 +29,15 @@ function Appointment() {
   const doctor = (doctorQuery.data as Doctor | null) ?? null;
   const user = myPatientQuery.data?.user ?? null;
 
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
-  const [appointmentType, setAppointmentType] = useState<"all" | "online" | "offline">("all");
-  const [chiefComplaint, setChiefComplaint] = useState("");
-  const [symptomsInput, setSymptomsInput] = useState("");
-  const [patientNotesHtml, setPatientNotesHtml] = useState("");
-  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(state?.selectedDate || null);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(state?.selectedSlotId || null);
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(state?.selectedSlot || null);
+  const [appointmentType, setAppointmentType] = useState<"all" | "online" | "offline">(state?.appointmentType || "all");
+  const [chiefComplaint, setChiefComplaint] = useState(state?.chiefComplaint || "");
+  const [symptomsInput, setSymptomsInput] = useState(state?.symptomsInput || "");
+  const [patientNotesHtml, setPatientNotesHtml] = useState(state?.patientNotesHtml || "");
+  const [showAdditionalInfo, setShowAdditionalInfo] = useState(!!(state?.chiefComplaint || state?.symptomsInput || state?.patientNotesHtml));
+
 
   const handleChangeAppointmentType = (value: "all" | "online" | "offline") => {
     setAppointmentType(value);

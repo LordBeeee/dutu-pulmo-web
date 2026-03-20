@@ -204,7 +204,7 @@ export default function AppointmentConfirm() {
             </div>
           </section>
 
-          <AgreementSection onConfirm={handleConfirmAppointment} onBack={() => navigate(-1)} loading={loading} />
+          <AgreementSection onConfirm={handleConfirmAppointment} onBack={() => navigate('/appointment', { state: { ...state, doctorId: doctor.id } })} loading={loading} />
         </div>
 
         <div className="space-y-6">

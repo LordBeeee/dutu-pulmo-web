@@ -18,20 +18,28 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   hospitalId,
   className = "",
 }) => {
-  const { data: favorite, isLoading } = doctorId
-    ? useCheckFavoriteDoctor(doctorId)
-    : useCheckFavoriteHospital(hospitalId!);
+  const doctorFav = useCheckFavoriteDoctor(doctorId ?? '');
+  const hospitalFav = useCheckFavoriteHospital(hospitalId ?? '');
+
+  const favQuery = doctorId ? doctorFav : hospitalFav;
+  const favorite = favQuery.data;
+  const isLoading = favQuery.isLoading;
 
   const addFavorite = useAddFavorite();
   const removeFavorite = useRemoveFavorite();
 
   const isFavorite = !!favorite;
+  const isPending = addFavorite.isPending || removeFavorite.isPending;
+
+  if (!doctorId && !hospitalId) {
+    return null;
+  }
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isLoading) return;
+    if (isLoading || isPending) return;
 
     try {
       if (isFavorite) {
@@ -50,7 +58,6 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
           : error instanceof Error
             ? error.message
             : "Thao tác thất bại";
-      console.error(errorMessage);
       toast.error(errorMessage);
     }
   };
@@ -58,7 +65,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   return (
     <button
       onClick={handleToggle}
-      disabled={addFavorite.isPending || removeFavorite.isPending}
+      disabled={isPending}
       className={`p-2 rounded-full transition-all flex items-center justify-center ${
         isFavorite
           ? "bg-red-50 text-red-500 hover:bg-red-100"

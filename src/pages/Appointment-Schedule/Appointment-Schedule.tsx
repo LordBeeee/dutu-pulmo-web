@@ -1,7 +1,8 @@
-﻿import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import DoctorPagination from '@/components/Doctor/DoctorPagination';
 import AppointmentCard from '@/components/appointments/AppointmentCard';
+import PendingPaymentBanner from '@/components/appointments/PendingPaymentBanner';
 import { APPOINTMENT_STATUS_OPTIONS } from '@/constants/appointment-status';
 import { useAppointments } from '@/hooks/use-appointments';
 import type { AppointmentListQuery } from '@/services/appointment.service';
@@ -98,6 +99,8 @@ function AppointmentSchedule() {
           <h1 className="text-2xl font-bold">Lịch khám của tôi</h1>
           <p className="text-slate-500 mt-1">Quản lý lịch khám theo trạng thái, ngày khám và thông tin tìm kiếm</p>
         </div>
+
+        {status !== 'PENDING_PAYMENT' && <div className="mt-4"><PendingPaymentBanner /></div>}
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-500">

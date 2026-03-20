@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAppointmentDetail } from "@/hooks/use-appointments";
 import { useCreateReview } from "@/hooks/use-reviews";
@@ -18,6 +18,22 @@ export default function AppointmentReviewPage() {
   const { data: appointment, isLoading: isLoadingAppointment } =
     useAppointmentDetail(appointmentId || "");
   const createReview = useCreateReview();
+
+  useEffect(() => {
+    if (!isLoadingAppointment && appointment) {
+      if (appointment.status !== "COMPLETED") {
+        toast.error("Bạn chỉ có thể đánh giá lịch hẹn đã hoàn thành.");
+        navigate(`/appointment-schedule/${appointmentId}`);
+      } else if (
+        appointment.patientRating !== undefined &&
+        appointment.patientRating !== null
+      ) {
+        toast.error("Bạn đã thực hiện đánh giá cho lịch hẹn này rồi.");
+        navigate(`/appointment-schedule/${appointmentId}`);
+      }
+    }
+  }, [isLoadingAppointment, appointment, navigate, appointmentId]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,7 +218,7 @@ export default function AppointmentReviewPage() {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/appointment-schedule/' + appointmentId)}
               className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors"
             >
               Hủy bỏ
