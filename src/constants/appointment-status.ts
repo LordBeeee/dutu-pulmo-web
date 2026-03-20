@@ -126,11 +126,8 @@ export function getAppointmentTypeLabel(type?: string): string {
   switch (type) {
     case "VIDEO":
       return "Khám video";
-    case "OFFLINE":
     case "IN_CLINIC":
       return "Khám tại cơ sở";
-    case "ONLINE":
-      return "Khám online";
     default:
       return type || "---";
   }
@@ -138,5 +135,5 @@ export function getAppointmentTypeLabel(type?: string): string {
 
 export function canCancelAppointmentByStatus(status?: string): boolean {
   if (!status) return false;
-  return ["PENDING", "PENDING_PAYMENT"].includes(status);
+  return ["PENDING", "PENDING_PAYMENT", "CONFIRMED"].includes(status);
 }

@@ -12,7 +12,9 @@ import type {
   ResetPasswordResponseDto,
   ResetPasswordWithOtpDto,
   VerifyOtpDto,
+  ChangePasswordDto,
 } from '@/types/auth.types';
+
 
 export const authService = {
   register: async (payload: RegisterDto) => {
@@ -69,6 +71,11 @@ export const authService = {
       content: 'Hello từ Patient Website! Đây là thông báo đẩy thử nghiệm.',
     });
   },
+  changePassword: async (payload: ChangePasswordDto) => {
+    const { data } = await api.patch<AuthMessageResponseDto>('/users/me/change-password', payload);
+    return data;
+  },
 };
+
 
 export default authService;

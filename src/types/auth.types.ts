@@ -66,3 +66,10 @@ export type RefreshTokenResponseDto = {
   accessToken: string;
   refreshToken?: string;
 };
+
+export type ChangePasswordDto = {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+

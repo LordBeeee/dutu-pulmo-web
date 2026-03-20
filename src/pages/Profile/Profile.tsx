@@ -367,6 +367,15 @@ function Profile() {
                       <span className="text-sm">Cài đặt</span>
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/change-password"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors font-medium"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">lock</span>
+                      <span className="text-sm">Đổi mật khẩu</span>
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
