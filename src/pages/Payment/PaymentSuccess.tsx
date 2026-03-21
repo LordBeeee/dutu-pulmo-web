@@ -80,7 +80,12 @@ export default function PaymentSuccess() {
     // Clear context after reading to prevent stale data on future visits
     localStorage.removeItem("payment_success_context");
     localStorage.removeItem("currentAppointmentId");
-  }, []);
+
+    // Guard: Redirect if direct access (no payment code from PayOS)
+    if (!code) {
+      navigate("/appointment-schedule", { replace: true });
+    }
+  }, [code, navigate]);
 
   const isPaid =
     code === "00" && status === "PAID" && (cancel === "false" || !cancel);

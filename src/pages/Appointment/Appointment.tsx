@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -37,6 +37,13 @@ function Appointment() {
   const [symptomsInput, setSymptomsInput] = useState(state?.symptomsInput || "");
   const [patientNotesHtml, setPatientNotesHtml] = useState(state?.patientNotesHtml || "");
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(!!(state?.chiefComplaint || state?.symptomsInput || state?.patientNotesHtml));
+
+  useEffect(() => {
+    if (!doctorId) {
+      toast.error("Vui lòng chọn bác sĩ trước khi đặt lịch.");
+      navigate("/doctor", { replace: true });
+    }
+  }, [doctorId, navigate]);
 
 
   const handleChangeAppointmentType = (value: "all" | "online" | "offline") => {

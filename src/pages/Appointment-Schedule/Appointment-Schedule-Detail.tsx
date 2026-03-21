@@ -3,9 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import CancelAppointmentModal from '@/components/appointments/CancelAppointmentModal';
 import {
-  canCancelAppointmentByStatus,
+  canCancelAppointment,
   getAppointmentStatusConfig,
   getAppointmentTypeLabel,
+  PATIENT_CANCEL_BEFORE_MINUTES,
 } from '@/constants/appointment-status';
 import { useAppointmentDetail, useCancelAppointment } from '@/hooks/use-appointments';
 
@@ -78,7 +79,21 @@ const AppointmentScheduleDetail: React.FC = () => {
   const appointment = appointmentQuery.data ?? null;
   const statusConfig = getAppointmentStatusConfig(appointment?.status);
 
-  const canCancel = canCancelAppointmentByStatus(appointment?.status);
+  const canCancel = canCancelAppointment(appointment?.status, appointment?.scheduledAt);
+
+  // minutesUntilStart handles warning UI logic
+  const minutesUntilStart = (new Date(appointment?.scheduledAt || '').getTime() - Date.now()) / (1000 * 60);
+  const isConfirmed = appointment?.status === 'CONFIRMED';
+  const isCancelled = appointment?.status === 'CANCELLED';
+
+  const showCancelWarning =
+    isConfirmed &&
+    minutesUntilStart < PATIENT_CANCEL_BEFORE_MINUTES + 60 &&
+    minutesUntilStart >= PATIENT_CANCEL_BEFORE_MINUTES;
+
+  const hoursUntilDeadline = Math.floor((minutesUntilStart - PATIENT_CANCEL_BEFORE_MINUTES) / 60);
+  const minutesUntilDeadline = Math.floor((minutesUntilStart - PATIENT_CANCEL_BEFORE_MINUTES) % 60);
+
   const canJoinVideo =
     appointment?.appointmentType === 'VIDEO' && ['CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS'].includes(appointment.status);
 
@@ -198,38 +213,75 @@ const AppointmentScheduleDetail: React.FC = () => {
           </section>
         </div>
 
-        <div className="p-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
-          <button type="button" onClick={() => navigate('/appointment-schedule')} className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">
-            Quay lại danh sách
-          </button>
+        <div className="p-5 border-t border-slate-100">
+          {(isConfirmed && !canCancel && !isCancelled) || showCancelWarning ? (
+            <div className="mb-3 space-y-2">
+              {isConfirmed && !canCancel && !isCancelled && (
+                <div className="flex items-start gap-2 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2">
+                  <span className="material-symbols-outlined text-orange-600 text-[18px]">schedule</span>
+                  <span className="text-xs leading-[18px] text-orange-700">
+                    Đã quá thời hạn hủy lịch (trước 4 tiếng).
+                  </span>
+                </div>
+              )}
 
-          <div className="flex items-center gap-3">
-            {canJoinVideo ? (
-              <Link to={`/video-call/${appointment.id}`} className="px-4 py-2.5 rounded-xl border border-primary text-primary font-semibold hover:bg-primary/5">
-                Vào phòng khám
-              </Link>
-            ) : null}
+              {showCancelWarning && (
+                <div className="flex items-start gap-2 rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2">
+                  <span className="material-symbols-outlined text-yellow-600 text-[18px]">warning</span>
+                  <span className="text-xs leading-[18px] text-yellow-800">
+                    Còn{' '}
+                    <span className="font-bold">
+                      {hoursUntilDeadline > 0
+                        ? `${hoursUntilDeadline}h ${minutesUntilDeadline}p`
+                        : `${minutesUntilDeadline} phút`}
+                    </span>{' '}
+                    để hủy lịch này.
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : null}
 
-            {appointment.status === 'COMPLETED' ? (
-              <Link
-                to={`/appointments/review?appointmentId=${appointment.id}`}
-                className="px-4 py-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 font-semibold hover:bg-amber-100 flex items-center gap-2 transition-all"
-              >
-                <span className="material-symbols-outlined text-sm">star</span>
-                <span>Đánh giá dịch vụ</span>
-              </Link>
-            ) : null}
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/appointment-schedule')}
+              className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              Quay lại danh sách
+            </button>
 
-            {canCancel ? (
-              <button
-                type="button"
-                onClick={() => setShowCancelModal(true)}
-                disabled={cancelAppointmentMutation.isPending}
-                className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200 font-semibold hover:bg-red-100 disabled:opacity-60"
-              >
-                {cancelAppointmentMutation.isPending ? 'Đang hủy...' : 'Hủy lịch khám'}
-              </button>
-            ) : null}
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              {canJoinVideo ? (
+                <Link
+                  to={`/video-call/${appointment.id}`}
+                  className="px-4 py-2.5 rounded-xl border border-primary text-primary font-semibold hover:bg-primary/5 whitespace-nowrap w-full sm:w-auto text-center"
+                >
+                  Vào phòng khám
+                </Link>
+              ) : null}
+
+              {appointment.status === 'COMPLETED' ? (
+                <Link
+                  to={`/appointments/review?appointmentId=${appointment.id}`}
+                  className="px-4 py-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 font-semibold hover:bg-amber-100 flex items-center justify-center gap-2 transition-all whitespace-nowrap w-full sm:w-auto"
+                >
+                  <span className="material-symbols-outlined text-sm">star</span>
+                  <span>Đánh giá dịch vụ</span>
+                </Link>
+              ) : null}
+
+              {canCancel ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={cancelAppointmentMutation.isPending}
+                  className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200 font-semibold hover:bg-red-100 disabled:opacity-60 whitespace-nowrap w-full sm:w-auto"
+                >
+                  {cancelAppointmentMutation.isPending ? 'Đang hủy...' : 'Hủy lịch khám'}
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

@@ -24,7 +24,10 @@ function getDaysInMonth(date: Date) {
 }
 
 function isSameMonth(date1: Date, date2: Date) {
-  return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth();
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth()
+  );
 }
 
 function CalendarSection({
@@ -34,6 +37,7 @@ function CalendarSection({
   onSelectDate,
 }: CalendarSectionProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
 
   const today = useMemo(() => {
     const now = new Date();
@@ -50,10 +54,18 @@ function CalendarSection({
   const from = formatDate(today);
   const to = formatDate(fiveYearLater);
 
-  const summaryQuery = useDoctorSlotSummary(doctorId, from, to, appointmentType);
+  const summaryQuery = useDoctorSlotSummary(
+    doctorId,
+    from,
+    to,
+    appointmentType,
+  );
 
   const summaryMap = useMemo(() => {
-    const map = new Map<string, { date: string; count: number; hasAvailability: boolean }>();
+    const map = new Map<
+      string,
+      { date: string; count: number; hasAvailability: boolean }
+    >();
     (summaryQuery.data ?? []).forEach((item) => {
       map.set(item.date, item);
     });
@@ -61,73 +73,105 @@ function CalendarSection({
   }, [summaryQuery.data]);
 
   const daysInMonth = getDaysInMonth(currentMonth);
-  const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+  const firstDayOfMonth = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth(),
+    1,
+  ).getDay();
+
   const monthValue = currentMonth.getMonth();
   const yearValue = currentMonth.getFullYear();
-  const yearOptions = [today.getFullYear(), today.getFullYear() + 1];
+  const yearOptions = [
+    today.getFullYear(),
+    today.getFullYear() + 1,
+    today.getFullYear() + 2,
+    today.getFullYear() + 3,
+    today.getFullYear() + 4,
+    today.getFullYear() + 5,
+  ];
 
-  const monthLabel = `Tháng ${String(currentMonth.getMonth() + 1).padStart(2, '0')} - ${currentMonth.getFullYear()}`;
+  const monthLabel = `Tháng ${String(
+    currentMonth.getMonth() + 1,
+  ).padStart(2, '0')} - ${currentMonth.getFullYear()}`;
+
   const canGoPrev = !isSameMonth(currentMonth, today);
-  const canGoNext = currentMonth < new Date(fiveYearLater.getFullYear(), fiveYearLater.getMonth(), 1);
+  const canGoNext =
+    currentMonth <
+    new Date(fiveYearLater.getFullYear(), fiveYearLater.getMonth(), 1);
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+      {/* Header */}
       <div className="flex items-center space-x-2 mb-6">
-        <span className="material-icons text-primary">calendar_today</span>
+        <span className="material-icons text-primary">
+          calendar_today
+        </span>
         <h4 className="font-bold">Chọn ngày khám</h4>
       </div>
 
       <div className="max-w-md mx-auto">
+        {/* Month navigation */}
         <div className="flex items-center justify-between mb-6 px-4">
           <button
             type="button"
             disabled={!canGoPrev}
-            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
-            className={`p-2 rounded-lg ${canGoPrev ? 'hover:bg-slate-100 dark:hover:bg-slate-800' : 'opacity-40 cursor-not-allowed'}`}
+            onClick={() =>
+              setCurrentMonth(
+                new Date(
+                  currentMonth.getFullYear(),
+                  currentMonth.getMonth() - 1,
+                  1,
+                ),
+              )
+            }
+            className={`p-2 rounded-lg ${
+              canGoPrev
+                ? 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'opacity-40 cursor-not-allowed'
+            }`}
           >
             <span className="material-icons">chevron_left</span>
           </button>
 
-          <span className="font-bold text-primary">{monthLabel}</span>
+          {/* CLICK HERE TO OPEN MODAL */}
+          <button
+            type="button"
+            onClick={() => setIsMonthPickerOpen(true)}
+            className="font-bold text-primary hover:underline"
+          >
+            {monthLabel}
+          </button>
 
           <button
             type="button"
             disabled={!canGoNext}
-            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
-            className={`p-2 rounded-lg ${canGoNext ? 'bg-primary text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+            onClick={() =>
+              setCurrentMonth(
+                new Date(
+                  currentMonth.getFullYear(),
+                  currentMonth.getMonth() + 1,
+                  1,
+                ),
+              )
+            }
+            className={`p-2 rounded-lg ${
+              canGoNext
+                ? 'bg-primary text-white'
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            }`}
           >
             <span className="material-icons">chevron_right</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4 px-4">
-          <select
-            value={monthValue}
-            onChange={(event) => setCurrentMonth(new Date(yearValue, Number(event.target.value), 1))}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          >
-            {Array.from({ length: 12 }, (_, index) => (
-              <option key={index} value={index}>
-                Tháng {index + 1}
-              </option>
-            ))}
-          </select>
+        {/* Loading */}
+        {summaryQuery.isLoading && (
+          <div className="text-sm text-slate-500 text-center mb-3">
+            Đang tải lịch trống...
+          </div>
+        )}
 
-          <select
-            value={yearValue}
-            onChange={(event) => setCurrentMonth(new Date(Number(event.target.value), monthValue, 1))}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          >
-            {yearOptions.map((year) => (
-              <option key={year} value={year}>
-                Năm {year}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {summaryQuery.isLoading && <div className="text-sm text-slate-500 text-center mb-3">Đang tải lịch trống...</div>}
-
+        {/* Calendar grid */}
         <div className="grid grid-cols-7 text-center text-xs mb-4">
           {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
             <div key={day} className="text-slate-400 py-2">
@@ -136,11 +180,15 @@ function CalendarSection({
           ))}
 
           {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-            <div key={`empty-${index}`} className="py-3 text-slate-300"></div>
+            <div key={`empty-${index}`} className="py-3"></div>
           ))}
 
           {daysInMonth.map((day) => {
-            const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+            const dateObj = new Date(
+              currentMonth.getFullYear(),
+              currentMonth.getMonth(),
+              day,
+            );
             dateObj.setHours(0, 0, 0, 0);
 
             const dateStr = formatDate(dateObj);
@@ -155,7 +203,10 @@ function CalendarSection({
 
             if (isPast || isOutOfRange) {
               return (
-                <div key={dateStr} className="py-3 rounded-lg text-slate-300 cursor-not-allowed">
+                <div
+                  key={dateStr}
+                  className="py-3 rounded-lg text-slate-300"
+                >
                   {day}
                 </div>
               );
@@ -163,7 +214,12 @@ function CalendarSection({
 
             if (isSelected) {
               return (
-                <button key={dateStr} type="button" onClick={() => onSelectDate(dateStr)} className="py-3 rounded-lg bg-primary text-white font-medium shadow-md shadow-primary/20">
+                <button
+                  key={dateStr}
+                  type="button"
+                  onClick={() => onSelectDate(dateStr)}
+                  className="py-3 rounded-lg bg-primary text-white font-medium shadow-md"
+                >
                   <div>{day}</div>
                   <div className="text-[8px] mt-1">Đang chọn</div>
                 </button>
@@ -172,7 +228,10 @@ function CalendarSection({
 
             if (isFull) {
               return (
-                <div key={dateStr} className="py-3 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 cursor-not-allowed">
+                <div
+                  key={dateStr}
+                  className="py-3 rounded-lg bg-slate-100 text-slate-400"
+                >
                   <div>{day}</div>
                   <div className="text-[8px] mt-1">Hết lịch</div>
                 </div>
@@ -181,21 +240,92 @@ function CalendarSection({
 
             if (isAvailable) {
               return (
-                <button key={dateStr} type="button" onClick={() => onSelectDate(dateStr)} className="py-3 rounded-lg bg-blue-50 text-primary font-medium hover:opacity-90 transition">
+                <button
+                  key={dateStr}
+                  type="button"
+                  onClick={() => onSelectDate(dateStr)}
+                  className="py-3 rounded-lg bg-blue-50 text-primary font-medium"
+                >
                   <div>{day}</div>
-                  <div className="text-[8px] mt-1">Còn {count} slot</div>
+                  <div className="text-[8px] mt-1">
+                    Còn {count} slot
+                  </div>
                 </button>
               );
             }
 
             return (
-              <div key={dateStr} className="py-3 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 cursor-not-allowed">
-                <div>{day}</div>
+              <div
+                key={dateStr}
+                className="py-3 rounded-lg bg-slate-100 text-slate-400"
+              >
+                {day}
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* ================= MODAL ================= */}
+      {isMonthPickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 w-[320px] shadow-lg">
+            <h4 className="font-bold mb-4 text-center">
+              Chọn tháng & năm
+            </h4>
+
+            {/* Month */}
+            <select
+              value={monthValue}
+              onChange={(e) =>
+                setCurrentMonth(
+                  new Date(yearValue, Number(e.target.value), 1),
+                )
+              }
+              className="w-full mb-3 rounded-lg border px-3 py-2"
+            >
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i} value={i}>
+                  Tháng {i + 1}
+                </option>
+              ))}
+            </select>
+
+            {/* Year */}
+            <select
+              value={yearValue}
+              onChange={(e) =>
+                setCurrentMonth(
+                  new Date(Number(e.target.value), monthValue, 1),
+                )
+              }
+              className="w-full mb-4 rounded-lg border px-3 py-2"
+            >
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  Năm {y}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setIsMonthPickerOpen(false)}
+                className="px-3 py-2 rounded-lg bg-slate-200"
+              >
+                Hủy
+              </button>
+
+              <button
+                onClick={() => setIsMonthPickerOpen(false)}
+                className="px-3 py-2 rounded-lg bg-primary text-white"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
