@@ -88,7 +88,7 @@ const AppointmentScheduleDetail: React.FC = () => {
   const appointment = appointmentQuery.data ?? null;
   const statusConfig = getAppointmentStatusConfig(appointment?.status);
 
-  const canCancel = canCancelAppointment(appointment?.status);
+  const canCancel = canCancelAppointment(appointment?.status, appointment?.scheduledAt);
 
   const hasReviewedThisAppointment = reviewsQuery.data?.some((r) => r.appointmentId === appointment?.id);
 
