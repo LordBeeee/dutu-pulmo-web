@@ -1,23 +1,3 @@
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import type { Doctor } from "../../types/doctor";
-import type { UserProfile } from "../../types/user";
-import type { TimeSlot } from "../../components/appointment/TimeSlotSection";
-
-interface AppointmentResponse {
-  id: string;
-  appointmentCode?: string;
-  qrCode?: string;
-  status?: string;
-}
-
-interface PaymentSuccessState {
-  appointment?: AppointmentResponse;
-  doctor: Doctor;
-  user: UserProfile;
-  selectedDate: string;
-  selectedSlot: TimeSlot;
-}
-
 function formatDateTimeNow() {
   return new Intl.DateTimeFormat("vi-VN", {
     hour: "2-digit",
@@ -66,80 +46,91 @@ function formatGender(gender?: string) {
   return gender;
 }
 
-function formatVietnamTime(dateString?: string) {
-  if (!dateString) return "--";
-  return new Intl.DateTimeFormat("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Ho_Chi_Minh",
-  }).format(new Date(dateString));
-}
-
-function getDoctorName(doctor?: Doctor) {
-  if (!doctor) return "--";
-  return doctor.fullName || "--";
-}
-
-function getDoctorAvatar(doctor?: Doctor) {
+function getDoctorAvatar(doctor?: any) {
   return (
     doctor?.avatarUrl ||
     "https://via.placeholder.com/150?text=Doctor"
   );
 }
 
-function getPatientPhone(user?: UserProfile) {
-  return user?.phone || "--";
-}
-
-function getPatientName(user?: UserProfile) {
-  return user?.fullName || "--";
-}
-
-function getPatientDob(user?: UserProfile) {
-  return user?.dateOfBirth || undefined;
-}
-
-function getPatientGender(user?: UserProfile) {
-  return user?.gender || "--";
-}
-
-function getAppointmentCode(appointment?: AppointmentResponse) {
-  return appointment?.appointmentCode || appointment?.id || "--";
-}
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { useAppointmentDetail } from "../../hooks/use-appointments";
 
 export default function PaymentSuccess() {
-  const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-//   const state = location.state as PaymentSuccessState | null;
-  const savedState = localStorage.getItem("payment_success_context");
-
-  const state =
-  (location.state as PaymentSuccessState | null) ||
-  (savedState ? (JSON.parse(savedState) as PaymentSuccessState) : null);
   const code = searchParams.get("code");
   const status = searchParams.get("status");
   const cancel = searchParams.get("cancel");
   const paymentId = searchParams.get("id");
-  const orderCode = searchParams.get("orderCode");
+
+  // Priority: URL Param > LocalStorage
+  const appointmentId =
+    searchParams.get("appointmentId") ||
+    localStorage.getItem("currentAppointmentId") ||
+    "";
+
+  const appointmentQuery = useAppointmentDetail(appointmentId);
+  const appointment = appointmentQuery.data;
+
+  useEffect(() => {
+    // Clear context after reading to prevent stale data on future visits
+    localStorage.removeItem("payment_success_context");
+    localStorage.removeItem("currentAppointmentId");
+
+    // Guard: Redirect if direct access (no payment code from PayOS)
+    if (!code) {
+      navigate("/appointment-schedule", { replace: true });
+    }
+  }, [code, navigate]);
 
   const isPaid =
-    code === "00" && status === "PAID" && cancel === "false";
+    code === "00" && status === "PAID" && (cancel === "false" || !cancel);
+  const isCancelled = cancel === "true" || status === "CANCELLED";
+  const isFailed = !isPaid && !isCancelled && code !== null;
 
-  if (!state) {
+  // Loading state
+  if (appointmentQuery.isLoading) {
+    return (
+      <main className="flex-grow flex items-center justify-center p-6 md:p-12">
+        <div className="max-w-xl w-full bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4">
+          <div className="w-20 h-20 bg-slate-100 rounded-full animate-pulse mx-auto" />
+          <div className="h-8 bg-slate-100 rounded animate-pulse w-3/4 mx-auto" />
+          <div className="h-4 bg-slate-100 rounded animate-pulse w-1/2 mx-auto" />
+          <div className="space-y-2 pt-4">
+            <div className="h-12 bg-slate-100 rounded animate-pulse" />
+            <div className="h-12 bg-slate-100 rounded animate-pulse" />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Error/Missing data state
+  if (appointmentQuery.isError || !appointment) {
     return (
       <main className="flex-grow flex items-center justify-center p-6 md:p-12">
         <div className="max-w-xl w-full bg-white rounded-2xl border border-slate-200 p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="material-icons-round text-green-500 text-5xl">
-              check_circle
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+            isPaid ? "bg-green-100 text-green-500" : 
+            isCancelled ? "bg-amber-100 text-amber-500" : 
+            isFailed ? "bg-red-100 text-red-500" :
+            "bg-slate-100 text-slate-500"
+          }`}>
+            <span className="material-icons-round text-5xl">
+              {isPaid ? "check_circle" : isCancelled ? "info" : isFailed ? "error" : "help_outline"}
             </span>
           </div>
-
-          <h2 className="text-2xl font-bold text-green-600 mb-2">
-            {isPaid ? "Thanh toán thành công" : "Trạng thái thanh toán"}
+          <h2 className={`text-2xl font-bold mb-2 ${
+            isPaid ? "text-green-600" : 
+            isCancelled ? "text-amber-600" : 
+            isFailed ? "text-red-600" :
+            "text-slate-600"
+          }`}>
+            {isPaid ? "Thanh toán thành công" : isCancelled ? "Đã hủy thanh toán" : isFailed ? "Thanh toán thất bại" : "Trạng thái thanh toán"}
           </h2>
 
           <p className="text-slate-500 text-sm mb-6">
@@ -148,22 +139,18 @@ export default function PaymentSuccess() {
 
           <div className="bg-slate-50 rounded-xl p-4 text-left space-y-3 mb-6">
             <div className="flex justify-between">
-              <span className="text-slate-500">Payment ID</span>
+              <span className="text-slate-500">Mã giao dịch</span>
               <span className="font-medium">{paymentId || "--"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Order code</span>
-              <span className="font-medium">{orderCode || "--"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">Status</span>
-              <span className="font-medium">{status || "--"}</span>
+              <span className="text-slate-500">Trạng thái</span>
+              <span className="font-medium">{status || (isPaid ? "Thành công" : isFailed ? "Thất bại" : "Đã hủy")}</span>
             </div>
           </div>
 
           <button
             onClick={() => navigate("/")}
-            className="bg-primary text-white py-3 px-6 rounded-xl font-bold"
+            className="bg-primary text-white py-3 px-6 rounded-xl font-bold hover:opacity-90 transition-opacity"
           >
             Về trang chủ
           </button>
@@ -172,31 +159,42 @@ export default function PaymentSuccess() {
     );
   }
 
-  const { appointment, doctor, user, selectedDate, selectedSlot } = state;
+  // Success path with appointment data
+  const doctor = appointment.doctor;
+  const userInner = appointment.patient?.user;
 
-  const doctorName = getDoctorName(doctor);
-  const doctorAvatar = getDoctorAvatar(doctor);
-  const patientName = getPatientName(user);
-  const patientPhone = getPatientPhone(user);
-  const patientDob = formatBirthDate(getPatientDob(user));
-  const patientGender = formatGender(getPatientGender(user));
-  const appointmentCode = getAppointmentCode(appointment);
-  const appointmentDate = formatAppointmentDate(selectedDate);
-  const slotTime = `${formatVietnamTime(selectedSlot?.startTime)} - ${formatVietnamTime(
-    selectedSlot?.endTime
-  )}`;
+  const doctorName = doctor?.fullName || "Bác sĩ Duy Tu";
+  const doctorAvatar = getDoctorAvatar(doctor as any);
+  const patientName = userInner?.fullName || "--";
+  const patientPhone = userInner?.phone || "--";
+  const patientDob = formatBirthDate(userInner?.dateOfBirth);
+  const patientGender = formatGender(userInner?.gender);
+
+  const appointmentCode = appointment.appointmentNumber || appointment.id;
+  const appointmentDate = formatAppointmentDate(appointment.scheduledAt);
+  const slotTime = appointment.scheduledAt 
+    ? `${new Date(appointment.scheduledAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` 
+    : "--";
 
   const qrImage =
-    appointment?.qrCode ||
     "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
       encodeURIComponent(appointmentCode);
 
   const handleCopy = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
-      alert("Đã sao chép");
-    } catch {
-      alert("Không thể sao chép");
+      toast.success("Đã sao chép");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error && (error as any).response?.data?.message
+          ? typeof (error as any).response.data.message === 'string'
+            ? (error as any).response.data.message
+            : (error as any).response.data.message.message
+          : error instanceof Error
+            ? error.message
+            : 'Không thể sao chép';
+      console.error(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -204,14 +202,24 @@ export default function PaymentSuccess() {
     <main className="flex-grow flex items-center justify-center p-6 md:p-12">
       <div className="max-w-2xl w-full flex flex-col items-center">
         <div className="flex flex-col items-center mb-8 text-center">
-          <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
-            <span className="material-icons-round text-green-500 text-5xl">
-              check_circle
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
+            isPaid ? "bg-green-100 dark:bg-green-900/30 text-green-500" : 
+            isCancelled ? "bg-amber-100 dark:bg-amber-900/30 text-amber-500" : 
+            isFailed ? "bg-red-100 dark:bg-red-900/30 text-red-500" :
+            "bg-slate-100 dark:bg-slate-800/30 text-slate-500"
+          }`}>
+            <span className="material-icons-round text-5xl">
+              {isPaid ? "check_circle" : isCancelled ? "info" : isFailed ? "error" : "help_outline"}
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
-            {isPaid ? "Thanh toán thành công" : "Đã đặt lịch thành công"}
+          <h2 className={`text-2xl font-bold mb-1 ${
+            isPaid ? "text-green-600 dark:text-green-400" : 
+            isCancelled ? "text-amber-600 dark:text-amber-400" : 
+            isFailed ? "text-red-600 dark:text-red-400" :
+            "text-slate-600 dark:text-slate-400"
+          }`}>
+            {isPaid ? "Thanh toán thành công" : isCancelled ? "Đã hủy thanh toán" : isFailed ? "Thanh toán thất bại" : "Trạng thái thanh toán"}
           </h2>
 
           <p className="text-slate-500 dark:text-slate-400 text-sm">
@@ -298,21 +306,15 @@ export default function PaymentSuccess() {
                     <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
                       Trạng thái thanh toán
                     </p>
-                    <span className="font-semibold text-green-600">
-                      {status || appointment?.status || (isPaid ? "PAID" : "--")}
+                    <span className={`font-semibold ${
+                      isPaid ? "text-green-600" : 
+                      isCancelled ? "text-amber-600" : 
+                      isFailed ? "text-red-600" :
+                      "text-slate-600"
+                    }`}>
+                      {status || (isPaid ? "PAID" : isCancelled ? "CANCELLED" : isFailed ? "FAILED" : "--")}
                     </span>
                   </div>
-
-                  {orderCode ? (
-                    <div>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">
-                        Order code
-                      </p>
-                      <span className="font-semibold text-slate-700 dark:text-slate-200">
-                        {orderCode}
-                      </span>
-                    </div>
-                  ) : null}
                 </div>
               </div>
 
@@ -384,7 +386,7 @@ export default function PaymentSuccess() {
             <div className="mt-10 text-center">
               <button
                 type="button"
-                onClick={() => navigate("/lich-kham")}
+                onClick={() => navigate("/appointment-schedule")}
                 className="text-primary font-semibold text-sm hover:underline underline-offset-4 decoration-2"
               >
                 Xem chi tiết lịch khám
@@ -415,3 +417,5 @@ export default function PaymentSuccess() {
     </main>
   );
 }
+
+

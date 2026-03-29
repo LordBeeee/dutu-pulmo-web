@@ -95,7 +95,7 @@ function Footer() {
       {/* Bottom */}
       <div className="max-w-7xl mx-auto px-4 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
         <p className="text-xs text-slate-400">
-          © 2023 Dutu Pulmo. All rights reserved. Designed for Health.
+          © 2026 Dutu Pulmo. All rights reserved. Designed for Health.
         </p>
       </div>
     </footer>

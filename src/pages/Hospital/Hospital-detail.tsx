@@ -1,324 +1,157 @@
-// import { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
+import { Link, useParams } from 'react-router-dom';
 
-// const API_BASE_URL =
-//   import.meta.env.VITE_API_BASE_URL || "https://dutu-pulmo-be.onrender.com";
+import FavoriteButton from '@/components/ui/FavoriteButton';
+import { getSpecialtyConfig } from '@/components/home/SpecialtyConfig';
+import { useHospitalDetail, useHospitalDoctors } from '@/hooks/useHospitals';
 
-// interface Hospital {
-//   id: string;
-//   name: string;
-//   hospitalCode: string;
-//   phone: string;
-//   email: string;
-//   address: string;
-//   ward: string;
-//   province: string;
-//   latitude: string;
-//   longitude: string;
-//   logoUrl: string;
-//   createdAt: string;
-//   updatedAt: string;
-// }
+function HospitalDetailPage() {
+  const { id = '' } = useParams();
+  const hospitalQuery = useHospitalDetail(id);
+  const doctorsQuery = useHospitalDoctors(id, 1, 12);
 
-// function HopitalDeail() {
-//   const { id } = useParams();
-//   const [hospital, setHospital] = useState<Hospital | null>(null);
+  const hospital = hospitalQuery.data;
+  const doctors = doctorsQuery.data?.items ?? [];
 
-//   useEffect(() => {
-//     const fetchHospital = async () => {
-//         try {
-//         const res = await fetch(`${API_BASE_URL}/hospitals/${id}`);
-//         const result = await res.json();
-
-//         console.log("Hospital API response:", result);
-//         setHospital(result.data);
-//         } catch (error) {
-//         console.error("Error fetching hospital:", error);
-//         }
-//     };
-
-//     if (id) fetchHospital();
-//     }, [id]);
-
-//   if (!hospital) return <div className="p-10">Loading...</div>;
-
-//   return (
-//     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-//       {/* Breadcrumb */}
-//       <nav className="flex mb-6 text-sm font-medium">
-//         <ol className="inline-flex items-center space-x-1 md:space-x-3">
-//           <li>
-//             <a className="text-slate-500 hover:text-primary" href="#">
-//               Trang chủ
-//             </a>
-//           </li>
-
-//           <li className="flex items-center">
-//             <span className="material-icons-outlined text-slate-400 text-sm">
-//               chevron_right
-//             </span>
-//             <a className="ml-1 text-slate-500 hover:text-primary" href="#">
-//               Danh sách bệnh viện
-//             </a>
-//           </li>
-
-//           <li className="flex items-center">
-//             <span className="material-icons-outlined text-slate-400 text-sm">
-//               chevron_right
-//             </span>
-//             <span className="ml-1 text-slate-900 font-semibold">
-//               Chi tiết bệnh viện
-//             </span>
-//           </li>
-//         </ol>
-//       </nav>
-
-//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-//         {/* LEFT */}
-//         <div className="lg:col-span-2 space-y-6">
-
-//           {/* Hospital Card */}
-//           <div className="bg-white rounded-3xl p-8 border shadow-sm">
-//             <div className="flex flex-col md:flex-row gap-6">
-
-//               {/* Image */}
-//               <div className="w-full md:w-56 h-48 md:h-56 rounded-2xl overflow-hidden">
-//                 <img
-//                   src={hospital.logoUrl}
-//                   alt={hospital.name}
-//                   className="w-full h-full object-cover"
-//                 />
-//               </div>
-
-//               {/* Info */}
-//               <div className="flex-grow">
-
-//                 <p className="text-primary text-xs font-bold uppercase tracking-widest mb-1">
-//                   BỆNH VIỆN
-//                 </p>
-
-//                 <h1 className="text-3xl font-bold mb-2">
-//                   {hospital.name}
-//                 </h1>
-
-//                 <div className="flex gap-2 mb-4">
-
-//                   <span className="px-3 py-1 bg-blue-50 text-primary text-xs font-semibold rounded-full">
-//                     Mã: {hospital.hospitalCode}
-//                   </span>
-
-//                   <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-full flex items-center gap-1">
-//                     <span className="material-icons-outlined text-[14px]">
-//                       location_on
-//                     </span>
-//                     {hospital.province}
-//                   </span>
-
-//                 </div>
-
-//                 {/* Contact */}
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-600 mb-6">
-
-//                   <div className="flex items-start gap-3">
-//                     <span className="material-icons-outlined text-primary">
-//                       place
-//                     </span>
-//                     <p>{hospital.address}</p>
-//                   </div>
-
-//                   <div className="flex items-start gap-3">
-//                     <span className="material-icons-outlined text-primary">
-//                       call
-//                     </span>
-//                     <p>{hospital.phone}</p>
-//                   </div>
-
-//                   <div className="flex items-start gap-3">
-//                     <span className="material-icons-outlined text-primary">
-//                       mail
-//                     </span>
-//                     <p>{hospital.email}</p>
-//                   </div>
-
-//                 </div>
-
-//                 {/* Buttons */}
-//                 <div className="flex gap-3">
-
-//                   <button className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl">
-//                     <span className="material-icons-outlined text-lg">
-//                       event_available
-//                     </span>
-//                     Đặt lịch khám ngay
-//                   </button>
-
-//                   <a
-//                     href={`https://www.google.com/maps?q=${hospital.latitude},${hospital.longitude}`}
-//                     target="_blank"
-//                     className="flex items-center gap-2 px-6 py-3 border border-primary text-primary font-semibold rounded-xl"
-//                   >
-//                     <span className="material-icons-outlined text-lg">
-//                       map
-//                     </span>
-//                     Xem bản đồ
-//                   </a>
-
-//                 </div>
-
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Map */}
-//           <div className="bg-white rounded-3xl overflow-hidden border shadow-sm">
-
-//             <div className="p-6 border-b flex items-center justify-between">
-//               <h2 className="text-lg font-bold flex items-center gap-2">
-//                 <span className="material-icons-outlined text-primary">
-//                   explore
-//                 </span>
-//                 Vị trí & Bản đồ
-//               </h2>
-//             </div>
-
-//             <iframe
-//               className="w-full h-[350px]"
-//               src={`https://maps.google.com/maps?q=${hospital.latitude},${hospital.longitude}&z=15&output=embed`}
-//             />
-
-//           </div>
-
-//         </div>
-
-//         {/* RIGHT */}
-//         <div className="space-y-6">
-
-//           {/* Extra Info */}
-//           <div className="bg-white rounded-3xl p-6 border shadow-sm">
-
-//             <h3 className="font-bold mb-4 flex items-center gap-2">
-//               <span className="material-icons-outlined text-primary">
-//                 info
-//               </span>
-//               Thông tin bổ sung
-//             </h3>
-
-//             <div className="space-y-4">
-
-//               <div className="flex justify-between border-b pb-3">
-//                 <span className="text-sm text-slate-500">Khu vực</span>
-//                 <span className="text-sm font-semibold">
-//                   {hospital.province}
-//                 </span>
-//               </div>
-
-//               <div className="flex justify-between border-b pb-3">
-//                 <span className="text-sm text-slate-500">Phường</span>
-//                 <span className="text-sm font-semibold">
-//                   {hospital.ward || "—"}
-//                 </span>
-//               </div>
-
-//             </div>
-
-//           </div>
-
-//         </div>
-
-//       </div>
-
-//     </main>
-//   );
-// }
-
-// export default HopitalDeail;
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import HospitalBreadcrumb from "../../components/Hospital/HopitalDeail/HospitalBreadcrumb";
-import HospitalExtraInfo from "../../components/Hospital/HopitalDeail/HospitalExtraInfo";
-import HospitalHeaderCard from "../../components/Hospital/HopitalDeail/HospitalHeaderCard";
-import HospitalMap from "../../components/Hospital/HopitalDeail/HospitalMap";
-import { getDoctorsByHospital, getHospitalDetail } from "../../services/hospital";
-import type { Hospital } from "../../types/hospital";
-import type { Doctor } from "../../types/doctor";
-import HospitalDoctorsList from "../../components/Hospital/HopitalDeail/HospitalDoctorsList";
-
-function HospitalDetail() {
-  const { id } = useParams();
-
-  const [hospital, setHospital] = useState<Hospital | null>(null);
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [doctorsLoading, setDoctorsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchHospital = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const data = await getHospitalDetail(id);
-        setHospital(data);
-      } catch (err) {
-        console.error(err);
-        setError("Không tải được thông tin bệnh viện");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchDoctors = async () => {
-      try {
-        setDoctorsLoading(true);
-
-        const data = await getDoctorsByHospital(id, 1, 20);
-        setDoctors(data);
-      } catch (err) {
-        console.error(err);
-        setDoctors([]);
-      } finally {
-        setDoctorsLoading(false);
-      }
-    };
-
-    fetchHospital();
-    fetchDoctors();
-  }, [id]);
-
-  if (loading) {
-    return <div className="p-10">Đang tải...</div>;
+  if (hospitalQuery.isLoading) {
+    return (
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 text-slate-500">Đang tải thông tin cơ sở y tế...</div>
+      </main>
+    );
   }
 
-  if (error) {
-    return <div className="p-10 text-red-500">{error}</div>;
+  if (hospitalQuery.isError || !hospital) {
+    return (
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl border border-red-200 p-8 text-red-600">Không tìm thấy thông tin cơ sở y tế.</div>
+      </main>
+    );
   }
 
-  if (!hospital) {
-    return <div className="p-10">Không có dữ liệu bệnh viện</div>;
-  }
+  const isClinic = hospital.name.toLowerCase().includes('phòng khám') || hospital.name.toLowerCase().includes('phong kham');
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <HospitalBreadcrumb />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <HospitalHeaderCard hospital={hospital} />
-          <HospitalMap hospital={hospital} />
-          <HospitalDoctorsList doctors={doctors} loading={doctorsLoading} />
-        </div>
-
-        <div className="space-y-6">
-          <HospitalExtraInfo hospital={hospital} />
-        </div>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/" className="hover:text-primary">Trang chủ</Link>
+        <span className="material-symbols-outlined text-xs">chevron_right</span>
+        <Link to="/hospitals" className="hover:text-primary">Cơ sở y tế</Link>
+        <span className="material-symbols-outlined text-xs">chevron_right</span>
+        <span className="font-medium text-slate-900 line-clamp-1">{hospital.name}</span>
       </div>
+
+      <section className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-28 h-28 rounded-2xl bg-slate-50 overflow-hidden flex items-center justify-center flex-shrink-0">
+            {hospital.logoUrl ? (
+              <img src={hospital.logoUrl} alt={hospital.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-4xl text-primary">apartment</span>
+            )}
+          </div>
+
+          <div className="flex-1">
+            <div className="flex justify-between items-start">
+              <div>
+                <span
+                  className={`inline-flex px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                    isClinic ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
+                  }`}
+                >
+                  {isClinic ? 'Phòng khám' : 'Bệnh viện'}
+                </span>
+
+                <h1 className="mt-2 text-3xl font-bold text-slate-900">{hospital.name}</h1>
+              </div>
+              
+              <FavoriteButton hospitalId={hospital.id} className="shadow-sm border border-slate-100" />
+            </div>
+
+            {hospital.address ? (
+              <p className="mt-3 text-slate-600 flex items-start gap-2">
+                <span className="material-symbols-outlined text-base">location_on</span>
+                <span>{hospital.address}</span>
+              </p>
+            ) : null}
+
+            <div className="mt-5 flex flex-wrap gap-3 text-sm">
+              {hospital.phone ? (
+                <a href={`tel:${hospital.phone}`} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:opacity-90">
+                  <span className="material-symbols-outlined text-base">call</span>
+                  {hospital.phone}
+                </a>
+              ) : null}
+
+              {hospital.email ? (
+                <a href={`mailto:${hospital.email}`} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-50 text-orange-700 hover:opacity-90">
+                  <span className="material-symbols-outlined text-base">mail</span>
+                  {hospital.email}
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-slate-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-slate-900">Đội ngũ bác sĩ</h2>
+          <Link
+            to={id ? `/doctor?hospitalId=${encodeURIComponent(id)}` : '/doctor'}
+            className="text-primary font-semibold hover:underline"
+          >
+            Xem tất cả
+          </Link>
+        </div>
+
+        {doctorsQuery.isLoading ? (
+          <div className="text-slate-500 text-sm">Đang tải danh sách bác sĩ...</div>
+        ) : doctorsQuery.isError ? (
+          <div className="text-red-600 text-sm">Không thể tải danh sách bác sĩ.</div>
+        ) : doctors.length === 0 ? (
+          <div className="text-slate-500 text-sm">Chưa có bác sĩ tại cơ sở này.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {doctors.map((doctor) => {
+              const specialty = getSpecialtyConfig(doctor.specialty || '');
+
+              return (
+                <Link
+                  key={doctor.id}
+                  to={`/doctor/${doctor.id}`}
+                  className="rounded-xl border border-slate-200 p-4 hover:shadow-md transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center">
+                      {doctor.avatarUrl ? (
+                        <img src={doctor.avatarUrl} alt={doctor.fullName} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-primary font-bold">{doctor.fullName?.trim()?.charAt(0) || 'D'}</span>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-slate-900 line-clamp-1">{doctor.fullName}</h3>
+                      <p className="text-xs text-slate-500 line-clamp-1">{doctor.title || 'Bác sĩ'}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <span
+                      className="px-2 py-1 rounded text-[11px] font-medium"
+                      style={{ backgroundColor: specialty.bg, color: specialty.color }}
+                    >
+                      {specialty.label}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </main>
   );
 }
 
-export default HospitalDetail;
+export default HospitalDetailPage;

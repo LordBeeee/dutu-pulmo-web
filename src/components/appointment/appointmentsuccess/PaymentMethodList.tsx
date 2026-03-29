@@ -13,6 +13,30 @@ export default function PaymentMethodList() {
                 name="payment_method"
                 type="radio"
               />
+              <div className="w-12 h-12 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mr-4">
+                <span className="material-icons text-purple-600">
+                  qr_code_2
+                </span>
+              </div>
+              <div className="flex-grow">
+                <p className="font-semibold text-slate-800 dark:text-slate-100">
+                  Thanh toán qua PayOS
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Chuyển khoản ngân hàng qua mã VietQR
+                </p>
+              </div>
+              <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-colors">
+                <div className="w-2 h-2 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+              </div>
+            </label>
+
+            <label className="group relative flex items-center p-4 bg-card-light dark:bg-card-dark rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary cursor-pointer transition-all shadow-sm">
+              <input
+                className="sr-only peer"
+                name="payment_method"
+                type="radio"
+              />
               <div className="w-12 h-12 rounded-lg bg-pink-50 dark:bg-pink-900/20 flex items-center justify-center mr-4">
                 <span className="material-icons text-pink-600">
                   account_balance_wallet
@@ -95,30 +119,6 @@ export default function PaymentMethodList() {
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Visa, Mastercard, JCB
-                </p>
-              </div>
-              <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-colors">
-                <div className="w-2 h-2 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
-              </div>
-            </label>
-
-            <label className="group relative flex items-center p-4 bg-card-light dark:bg-card-dark rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary cursor-pointer transition-all shadow-sm">
-              <input
-                className="sr-only peer"
-                name="payment_method"
-                type="radio"
-              />
-              <div className="w-12 h-12 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mr-4">
-                <span className="material-icons text-purple-600">
-                  qr_code_2
-                </span>
-              </div>
-              <div className="flex-grow">
-                <p className="font-semibold text-slate-800 dark:text-slate-100">
-                  Thanh toán qua PayOS
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Chuyển khoản ngân hàng qua mã VietQR
                 </p>
               </div>
               <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-colors">

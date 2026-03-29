@@ -6,13 +6,17 @@ interface AppointmentInfoCardProps {
   doctor: Doctor;
   selectedDate: string;
   selectedSlot: TimeSlot;
+  appointmentType: 'all' | 'online' | 'offline';
 }
 
 export default function AppointmentInfoCard({
   doctor,
   selectedDate,
   selectedSlot,
+  appointmentType,
 }: AppointmentInfoCardProps) {
+  const isOnline = appointmentType === 'online';
+
   return (
     <section>
       <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">
@@ -35,12 +39,20 @@ export default function AppointmentInfoCard({
               <h3 className="font-bold text-blue-600 text-lg">
                 {doctor.fullName || "Chưa cập nhật"}
               </h3>
-              <p className="text-sm text-slate-600 mt-1">
-                Chuyên khoa:{" "}
-                <span className="text-slate-900">
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                   {doctor.specialty || "Chưa cập nhật"}
                 </span>
-              </p>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full border ${
+                    isOnline
+                      ? "bg-blue-50 text-blue-600 border-blue-100"
+                      : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                  }`}
+                >
+                  {isOnline ? "Khám Online" : "Khám tại phòng khám"}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -48,7 +60,8 @@ export default function AppointmentInfoCard({
             <div>
               <p className="text-xs text-slate-400 mb-1">Giờ khám</p>
               <p className="font-bold">
-                {formatVietnamTime(selectedSlot.startTime)} - {formatVietnamTime(selectedSlot.endTime)}
+                {formatVietnamTime(selectedSlot.startTime)} -{" "}
+                {formatVietnamTime(selectedSlot.endTime)}
               </p>
             </div>
 
