@@ -1,14 +1,18 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import type { Doctor } from "../../types/doctor";
-import type { UserProfile } from "../../types/user";
-import AppointmentBreadcrumb from "../../components/appointment/AppointmentBreadcrumb";
-import AppointmentSteps from "../../components/appointment/AppointmentSteps";
-import AppointmentInfoCard from "../../components/appointment/appointmentconfirm/AppointmentInfoCard";
-import PatientInfoCard from "../../components/appointment/appointmentconfirm/PatientInfoCard";
-import AgreementSection from "../../components/appointment/appointmentconfirm/AgreementSection";
-import PaymentSummaryCard from "../../components/appointment/appointmentconfirm/PaymentSummaryCard";
-import type { TimeSlot } from "../../components/appointment/TimeSlotSection";
-import { useState } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import type { Doctor } from '@/types/doctor';
+import type { UserProfile } from '@/types/user';
+import AppointmentBreadcrumb from '@/components/appointment/AppointmentBreadcrumb';
+import AppointmentSteps from '@/components/appointment/AppointmentSteps';
+import AppointmentInfoCard from '@/components/appointment/appointmentconfirm/AppointmentInfoCard';
+import PatientInfoCard from '@/components/appointment/appointmentconfirm/PatientInfoCard';
+import AgreementSection from '@/components/appointment/appointmentconfirm/AgreementSection';
+import PaymentSummaryCard from '@/components/appointment/appointmentconfirm/PaymentSummaryCard';
+import type { TimeSlot } from '@/components/appointment/TimeSlotSection';
+import { useCreateAppointment } from '@/hooks/use-appointments';
+import { useMyPatient } from '@/hooks/use-profile';
 
 interface AppointmentConfirmState {
   doctor: Doctor;
@@ -16,174 +20,112 @@ interface AppointmentConfirmState {
   selectedDate: string;
   selectedSlotId: string;
   selectedSlot: TimeSlot;
+  appointmentType: 'all' | 'online' | 'offline';
+  chiefComplaint?: string;
+  symptomsInput?: string;
+  patientNotesHtml?: string;
 }
+
 export default function AppointmentConfirm() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const createAppointmentMutation = useCreateAppointment();
+  const myPatientQuery = useMyPatient();
+
   const state = location.state as AppointmentConfirmState | null;
-  
+
   if (!state) {
     return (
       <main className="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
         <p className="text-red-500 mb-4">Không có dữ liệu đặt lịch.</p>
-        <button
-          onClick={() => navigate("/appointment")}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-        >
+        <button onClick={() => navigate('/appointment')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
           Quay lại
         </button>
       </main>
     );
   }
 
-  const { doctor, user, selectedDate, selectedSlot, selectedSlotId } = state;
-  // const handleConfirmAppointment = async () => {
-  //   try {
-  //     setLoading(true);
+  const {
+    doctor,
+    user,
+    selectedDate,
+    selectedSlot,
+    selectedSlotId,
+    appointmentType,
+    chiefComplaint: stateChiefComplaint = '',
+    symptomsInput = '',
+    patientNotesHtml = '',
+  } = state;
 
-  //     const token = localStorage.getItem("accessToken");
-  //     if (!token) {
-  //       alert("Bạn chưa đăng nhập.");
-  //       return;
-  //     }
+  const parsedSymptoms = symptomsInput
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
 
-  //     // Ghi log để xem đúng dữ liệu trước khi gửi
-  //     const payload = {
-  //       timeSlotId: selectedSlotId,
-  //       patientId: user.patientId,
-  //       hospitalId: doctor.primaryHospital?.id, // hoặc hospital.id nếu bạn có
-  //       subType: "SCHEDULED",
-  //       sourceType: "EXTERNAL",
-  //       chiefComplaint: "Khám bệnh",
-  //       symptoms: [],
-  //       patientNotes: "",
-  //     };
+  const chiefComplaint = stateChiefComplaint || (parsedSymptoms.length > 0 ? `Khám ${parsedSymptoms[0]}` : 'Khám bệnh');
 
-  //     console.log("Payload tạo lịch:", payload);
+  const isMeaningfulHtml = (value: string) => {
+    const plain = value
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .trim();
+    return plain.length > 0;
+  };
 
-  //     const res = await fetch("https://dutu-pulmo-be.onrender.com/appointments", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(payload),
-  //     });
+  const sanitizeRichText = (html: string): string => {
+    if (!html) return '';
 
-  //     const data = await res.json();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-  //     if (!res.ok) {
-  //       console.error("Create appointment error:", data);
-  //       throw new Error(data?.message || "Tạo lịch hẹn thất bại");
-  //     }
+    doc.querySelectorAll('script, style, iframe, object, embed').forEach((node) => node.remove());
 
-  //     alert("Đặt lịch thành công!");
+    doc.querySelectorAll('*').forEach((element) => {
+      [...element.attributes].forEach((attribute) => {
+        const name = attribute.name.toLowerCase();
+        const value = attribute.value.trim().toLowerCase();
 
-  //     // nếu backend trả về appointment mới tạo
-  //     // có thể chuyển sang trang thanh toán / trang thành công
-  //     navigate("/appointment-success", {
-  //       state: {
-  //         appointment: data.data,
-  //         doctor,
-  //         user,
-  //         selectedDate,
-  //         selectedSlot,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error("Lỗi tạo lịch:", error);
-  //     alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi tạo lịch");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+        if (name.startsWith('on') || value.startsWith('javascript:')) {
+          element.removeAttribute(attribute.name);
+        }
+      });
+    });
+
+    return doc.body.innerHTML;
+  };
+
+  const safePatientNotesHtml = isMeaningfulHtml(patientNotesHtml) ? sanitizeRichText(patientNotesHtml) : '';
+
   const handleConfirmAppointment = async () => {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        alert("Bạn chưa đăng nhập.");
-        return;
+      const patientId = myPatientQuery.data?.id;
+      if (!patientId) {
+        throw new Error('Không tìm thấy patientId');
       }
 
       if (!doctor.primaryHospital?.id) {
-        alert("Không tìm thấy bệnh viện của bác sĩ.");
-        return;
+        throw new Error('Không tìm thấy bệnh viện của bác sĩ');
       }
 
-      // 1. Lấy patient hiện tại từ token user
-      const patientRes = await fetch("https://dutu-pulmo-be.onrender.com/patients/me", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const patientData = await patientRes.json();
-
-      if (!patientRes.ok) {
-        const patientError =
-          typeof patientData?.message === "string"
-            ? patientData.message
-            : patientData?.message?.message ||
-              patientData?.error ||
-              "Không lấy được thông tin bệnh nhân";
-
-        throw new Error(patientError);
-      }
-
-      const patientId = patientData?.data?.id || patientData?.id;
-
-      if (!patientId) {
-        throw new Error("Không tìm thấy patientId");
-      }
-
-      // 2. Tạo payload đúng
-      const payload = {
+      const appointment = await createAppointmentMutation.mutateAsync({
         timeSlotId: selectedSlotId,
-        patientId: patientId,
+        patientId,
         hospitalId: doctor.primaryHospital.id,
-        subType: "SCHEDULED",
-        sourceType: "EXTERNAL",
-        chiefComplaint: "Khám bệnh",
-        symptoms: [],
-        patientNotes: "",
-      };
-
-      console.log("Patient me:", patientData);
-      console.log("Payload tạo lịch:", payload);
-
-      // 3. Gọi API tạo lịch
-      const res = await fetch("https://dutu-pulmo-be.onrender.com/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
+        subType: 'SCHEDULED',
+        sourceType: 'EXTERNAL',
+        chiefComplaint,
+        symptoms: parsedSymptoms,
+        patientNotes: safePatientNotesHtml || '',
       });
 
-      const data = await res.json();
+      toast.success('Đặt lịch thành công');
 
-      if (!res.ok) {
-        console.error("Create appointment error:", data);
-
-        const errorMessage =
-          typeof data?.message === "string"
-            ? data.message
-            : data?.message?.message || data?.error || "Tạo lịch hẹn thất bại";
-
-        throw new Error(errorMessage);
-      }
-
-      alert("Đặt lịch thành công!");
-
-      navigate("/appointment-success", {
+      navigate('/appointment-success', {
         state: {
-          appointment: data.data,
+          appointment,
           doctor,
           user,
           selectedDate,
@@ -191,12 +133,21 @@ export default function AppointmentConfirm() {
         },
       });
     } catch (error) {
-      console.error("Lỗi tạo lịch:", error);
-      alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi tạo lịch");
+      const errorMessage =
+        error instanceof Error && (error as any).response?.data?.message
+          ? typeof (error as any).response.data.message === 'string'
+            ? (error as any).response.data.message
+            : (error as any).response.data.message.message
+          : error instanceof Error
+            ? error.message
+            : 'Có lỗi xảy ra khi tạo lịch';
+      console.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
       <AppointmentBreadcrumb />
@@ -209,20 +160,58 @@ export default function AppointmentConfirm() {
             doctor={doctor}
             selectedDate={selectedDate}
             selectedSlot={selectedSlot}
+            appointmentType={appointmentType}
           />
           <PatientInfoCard user={user} />
+          <section className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+            <h3 className="text-lg font-bold mb-4">Thông tin bổ sung</h3>
 
-          {/* <AgreementSection /> */}
-          <AgreementSection
-            onConfirm={handleConfirmAppointment}
-            loading={loading}
-          />
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-slate-500 mb-2">Lý do khám</p>
+                <p className="font-medium text-slate-900">{chiefComplaint}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500 mb-2">Triệu chứng</p>
+                {parsedSymptoms.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {parsedSymptoms.map((symptom) => (
+                      <span
+                        key={symptom}
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200"
+                      >
+                        {symptom}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="font-medium text-slate-900">---</p>
+                )}
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500 mb-2">Ghi chú bệnh nhân</p>
+                {safePatientNotesHtml ? (
+                  <div
+                    className="prose prose-sm max-w-none text-slate-900 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0"
+                    dangerouslySetInnerHTML={{ __html: safePatientNotesHtml }}
+                  />
+                ) : (
+                  <p className="font-medium text-slate-900">---</p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <AgreementSection onConfirm={handleConfirmAppointment} onBack={() => navigate('/appointment', { state: { ...state, doctorId: doctor.id } })} loading={loading} />
         </div>
 
         <div className="space-y-6">
-          <PaymentSummaryCard selectedSlot={selectedSlot}/>
+          <PaymentSummaryCard selectedSlot={selectedSlot} />
         </div>
       </div>
     </main>
   );
 }
+
