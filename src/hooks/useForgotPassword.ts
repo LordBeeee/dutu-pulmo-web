@@ -8,3 +8,4 @@ export function useForgotPassword() {
     mutationFn: (payload: ForgotPasswordDto) => authService.forgotPasswordOtp(payload),
   });
 }
+

@@ -8,3 +8,4 @@ export function useResendOtp() {
     mutationFn: (payload: ResendVerificationDto) => authService.resendOtp(payload),
   });
 }
+

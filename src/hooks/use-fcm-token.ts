@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { onMessageListener, requestForToken } from "@/config/firebase";
 import { authService } from "@/services/auth.service";
 
+
 export const useFcmToken = (isAuthenticated: boolean) => {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const queryClient = useQueryClient();

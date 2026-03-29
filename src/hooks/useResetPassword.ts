@@ -8,3 +8,4 @@ export function useResetPassword() {
     mutationFn: (payload: ResetPasswordWithOtpDto) => authService.resetPasswordOtp(payload),
   });
 }
+

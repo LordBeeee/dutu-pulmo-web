@@ -15,6 +15,7 @@ export function useReports() {
   });
 }
 
+
 export function useReportDetail(reportId: string) {
   return useQuery({
     queryKey: reportKeys.detail(reportId),
