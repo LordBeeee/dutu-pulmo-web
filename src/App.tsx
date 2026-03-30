@@ -40,6 +40,7 @@ import SpecialtiesPage from '@/pages/Specialties/Specialties'
 import SupportPage from '@/pages/Support/Support'
 import VideoCallPage from '@/pages/Video-call/VideoCall'
 import VerifyOTP from '@/pages/Verify-otp/VerifyOTP'
+import AIChatPage from '@/pages/AIChat/AIChatPage'
 
 function RequireAuth() {
   const hydrated = useAuthStore((state) => state.hydrated)
@@ -130,6 +131,7 @@ function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/specialties" element={<SpecialtiesPage />} />
             <Route path="/video-call/:appointmentId" element={<VideoCallPage />} />
+            <Route path="/chat-ai" element={<AIChatPage />} />
           </Route>
         </Route>
       </Routes>
