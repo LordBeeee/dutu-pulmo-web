@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    color-scheme: light;
+}
+
 body {
     font-family: 'Inter', sans-serif;
 }
@@ -14,4 +18,37 @@ body {
 
 .pulse-soft {
     animation: pulse-ring 4s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    /* IE + Edge cũ */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+}
+
+[data-radix-scroll-area-scrollbar] {
+    display: none !important;
+}
+
+[data-radix-scroll-area-thumb] {
+    display: none !important;
+}
+
+/* Ẩn scrollbar của viewport (CÁI QUAN TRỌNG NHẤT) */
+[data-radix-scroll-area-viewport] {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE */
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+    display: none;
+    /* Chrome */
 }

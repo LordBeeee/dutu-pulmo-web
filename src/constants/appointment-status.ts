@@ -6,7 +6,8 @@ export type AppointmentStatus =
   | "CHECKED_IN"
   | "IN_PROGRESS"
   | "COMPLETED"
-  | "RESCHEDULED";
+  | "RESCHEDULED"
+  | "NO_SHOW";
 
 export type AppointmentStatusFilter =
   | "ALL"
@@ -83,6 +84,13 @@ export const APPOINTMENT_STATUS_CONFIG: Record<
     textClass: "text-orange-700",
     borderClass: "border-orange-200",
   },
+  NO_SHOW: {
+    label: "Vắng mặt",
+    icon: "person_off",
+    bgClass: "bg-slate-50",
+    textClass: "text-slate-600",
+    borderClass: "border-slate-200",
+  },
 };
 
 export const FALLBACK_APPOINTMENT_STATUS = APPOINTMENT_STATUS_CONFIG.PENDING;
@@ -113,6 +121,7 @@ export const APPOINTMENT_STATUS_OPTIONS: Array<{
   { value: "COMPLETED", label: APPOINTMENT_STATUS_CONFIG.COMPLETED.label },
   { value: "CANCELLED", label: APPOINTMENT_STATUS_CONFIG.CANCELLED.label },
   { value: "RESCHEDULED", label: APPOINTMENT_STATUS_CONFIG.RESCHEDULED.label },
+  { value: "NO_SHOW", label: APPOINTMENT_STATUS_CONFIG.NO_SHOW.label },
 ];
 
 export function getAppointmentStatusConfig(
@@ -135,8 +144,15 @@ export function getAppointmentTypeLabel(type?: string): string {
 
 export const PATIENT_CANCEL_BEFORE_MINUTES = 4 * 60;
 
-export function canCancelAppointment(status?: string): boolean {
+export function canCancelAppointment(
+  status?: string,
+  scheduledAt?: string,
+): boolean {
   if (!status) return false;
+
+  if (scheduledAt && new Date(scheduledAt) < new Date()) {
+    return false;
+  }
 
   if (["PENDING", "PENDING_PAYMENT"].includes(status)) return true;
 

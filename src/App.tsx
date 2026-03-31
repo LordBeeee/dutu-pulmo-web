@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import { useFcmToken } from '@/hooks/use-fcm-token'
 import MainLayout from '@/layouts/MainLayout'
 import { useAuthStore } from '@/store/auth.store'
+import AIChatPage from '@/pages/AIChat/AIChatPage'
 import Appointment from '@/pages/Appointment/Appointment'
 import AppointmentConfirm from '@/pages/Appointment/AppointmentConfirm'
 import AppointmentReviewPage from '@/pages/Appointment/AppointmentReview'
@@ -15,7 +16,7 @@ import ChatPage from '@/pages/Chat/Chat'
 import Doctor from '@/pages/Doctor/Doctor'
 import DoctorDetail from '@/pages/Doctor/Doctor-detail'
 import FavoritesPage from '@/pages/Favorites/Favorites'
-import ForgotPassword from '@/pages/forgot-password/ForgotPassword'
+import ForgotPassword from '@/pages/Forgot-password/ForgotPassword'
 import Home from '@/pages/Home/Home'
 import HospitalDetailPage from '@/pages/Hospital/Hospital-detail'
 import HospitalsPage from '@/pages/Hospital/Hospitals'
@@ -28,6 +29,7 @@ import NewsPage from '@/pages/News/News'
 import NewsDetail from '@/pages/News/NewsDetail'
 import NotificationsPage from '@/pages/Notifications/Notifications'
 import PaymentSuccess from '@/pages/Payment/PaymentSuccess'
+import PaymentCancel from '@/pages/Payment/PaymentCancel'
 import PaymentPage from '@/pages/Payment/Payment'
 import PrescriptionDetailPage from '@/pages/Prescriptions/Prescription-detail'
 import PrescriptionsPage from '@/pages/Prescriptions/Prescriptions'
@@ -40,7 +42,6 @@ import SpecialtiesPage from '@/pages/Specialties/Specialties'
 import SupportPage from '@/pages/Support/Support'
 import VideoCallPage from '@/pages/Video-call/VideoCall'
 import VerifyOTP from '@/pages/Verify-otp/VerifyOTP'
-import AIChatPage from '@/pages/AIChat/AIChatPage'
 
 function RequireAuth() {
   const hydrated = useAuthStore((state) => state.hydrated)
@@ -111,6 +112,7 @@ function App() {
             <Route path="/appointment-success" element={<AppointmentSuccess />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment/return" element={<PaymentSuccess />} />
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
             <Route path="/appointment-schedule" element={<AppointmentSchedule />} />
             <Route path="/appointment-schedule/:id" element={<AppointmentScheduleDetail />} />
             <Route path="/doctor" element={<Doctor />} />
@@ -130,8 +132,8 @@ function App() {
             <Route path="/prescriptions/:prescriptionId" element={<PrescriptionDetailPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/specialties" element={<SpecialtiesPage />} />
-            <Route path="/video-call/:appointmentId" element={<VideoCallPage />} />
             <Route path="/chat-ai" element={<AIChatPage />} />
+            <Route path="/video-call/:appointmentId" element={<VideoCallPage />} />
           </Route>
         </Route>
       </Routes>
