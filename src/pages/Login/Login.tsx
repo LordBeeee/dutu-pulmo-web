@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,6 +18,14 @@ function Login() {
     email?: string;
     password?: string;
   }>({});
+
+  const handleGoogleLogin = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = encodeURIComponent(`${import.meta.env.VITE_API_BASE_URL}/auth/google/callback`);
+    const scope = encodeURIComponent('openid email profile');
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
+    window.location.href = googleAuthUrl;
+  };
 
   useEffect(() => {
     if (accessToken && user) {
@@ -288,6 +296,7 @@ function Login() {
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
+                onClick={handleGoogleLogin}
                 className="flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all group"
               >
                 <img

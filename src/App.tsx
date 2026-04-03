@@ -21,6 +21,7 @@ import Home from '@/pages/Home/Home'
 import HospitalDetailPage from '@/pages/Hospital/Hospital-detail'
 import HospitalsPage from '@/pages/Hospital/Hospitals'
 import Login from '@/pages/Login/Login'
+import LoginSuccess from '@/pages/Login/LoginSuccess'
 import MedicalRecordDetailPage from '@/pages/Medical-records/MedicalRecord-detail'
 import MedicalRecordsPage from '@/pages/Medical-records/MedicalRecords'
 import MyReviewsPage from '@/pages/My-reviews/MyReviews'
@@ -90,6 +91,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
+
+        {/* Google OAuth callback - outside auth guards */}
+        <Route path="/login-success" element={<LoginSuccess />} />
 
         <Route element={<RequireAuth />}>
           <Route element={<MainLayout />}>
