@@ -155,4 +155,9 @@ export const appointmentService = {
     const { data } = await api.get<{ canJoin: boolean; message: string }>(`/appointments/${appointmentId}/video/status`);
     return data;
   },
+
+  checkInAppointment: async (appointmentId: string) => {
+    const { data } = await api.post<{ success: boolean; message: string }>(`/appointments/${appointmentId}/check-in`);
+    return data;
+  },
 };

@@ -133,6 +133,26 @@ export function useVideoCallStatus(appointmentId: string) {
   });
 }
 
+export function useCheckInVideoCall() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (appointmentId: string) =>
+      appointmentService.checkInAppointment(appointmentId),
+    onSuccess: (_, appointmentId) => {
+      void queryClient.invalidateQueries({
+        queryKey: appointmentKeys.detail(appointmentId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: appointmentKeys.myList(),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: appointmentKeys.videoStatus(appointmentId),
+      });
+    },
+  });
+}
+
 // ─── VIDEO CALL MANAGER HOOK (Daily.co) ──────────────────────────────────────
 
 export type VideoCallStatus =

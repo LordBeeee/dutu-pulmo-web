@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { getAppointmentStatusConfig, getAppointmentTypeLabel } from '@/constants/appointment-status';
 import type { AppointmentResponse } from '@/services/appointment.service';
+import { useCheckInVideoCall } from '@/hooks/use-appointments';
 
 type AppointmentCardProps = {
   appointment: AppointmentResponse;
@@ -18,8 +20,13 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
   const hospitalName = appointment.hospital?.name || 'Đang cập nhật cơ sở';
   const isPendingPayment = appointment.status === 'PENDING_PAYMENT';
 
+  const checkInMutation = useCheckInVideoCall();
+
   const handleNavigate = () => {
-    navigate(`/appointment-schedule/${appointment.id}`);
+    // Only navigate to detail if we aren't currently waiting for check-in on this card
+    if (!checkInMutation.isPending) {
+        navigate(`/appointment-schedule/${appointment.id}`);
+    }
   };
 
   return (
@@ -125,14 +132,34 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
         {appointment.appointmentType === 'VIDEO' && ['CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS'].includes(appointment.status) && (
           <button
             type="button"
-            onClick={(event) => {
+            disabled={checkInMutation.isPending}
+            onClick={async (event) => {
               event.stopPropagation();
-              navigate(`/video-call/${appointment.id}`);
+              try {
+                // Chỉ gọi check-in nếu chưa điểm danh (status === 'CONFIRMED')
+                if (appointment.status === 'CONFIRMED') {
+                  await checkInMutation.mutateAsync(appointment.id);
+                }
+                navigate(`/video-call/${appointment.id}`);
+              } catch (error: any) {
+                const errorMsg = error?.response?.data?.message || error?.message || 'Không thể tham gia phòng video';
+                toast.error(errorMsg);
+              }
             }}
-            className="flex-1 rounded-xl bg-blue-600 py-2.5 text-white font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className={`flex-1 rounded-xl py-2.5 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm ${
+              checkInMutation.isPending ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
-            <span className="material-symbols-outlined text-sm">video_call</span>
-            Vào khám
+            {checkInMutation.isPending ? (
+              <span className="material-symbols-outlined text-sm animate-spin">hourglass_empty</span>
+            ) : (
+              <span className="material-symbols-outlined text-sm">video_call</span>
+            )}
+            {checkInMutation.isPending 
+              ? 'Đang chuẩn bị...' 
+              : appointment.status === 'CONFIRMED' 
+                ? 'Điểm danh & Vào khám' 
+                : 'Vào phòng khám'}
           </button>
         )}
       </div>

@@ -8,8 +8,9 @@ import {
   getAppointmentTypeLabel,
   PATIENT_CANCEL_BEFORE_MINUTES,
 } from '@/constants/appointment-status';
-import { useAppointmentDetail, useCancelAppointment } from '@/hooks/use-appointments';
+import { useAppointmentDetail, useCancelAppointment, useCheckInVideoCall } from '@/hooks/use-appointments';
 import { useMyReviews } from '@/hooks/use-reviews';
+import { toast } from 'sonner';
 
 function formatDate(date?: string) {
   if (!date) return '---';
@@ -84,6 +85,7 @@ const AppointmentScheduleDetail: React.FC = () => {
 
   const appointmentQuery = useAppointmentDetail(id);
   const cancelAppointmentMutation = useCancelAppointment();
+  const checkInMutation = useCheckInVideoCall();
 
   const appointment = appointmentQuery.data ?? null;
   const statusConfig = getAppointmentStatusConfig(appointment?.status);
@@ -281,12 +283,36 @@ const AppointmentScheduleDetail: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               {canJoinVideo ? (
-                <Link
-                  to={`/video-call/${appointment.id}`}
-                  className="px-4 py-2.5 rounded-xl border border-primary text-primary font-semibold hover:bg-primary/5 whitespace-nowrap w-full sm:w-auto text-center"
+                <button
+                  type="button"
+                  disabled={checkInMutation.isPending}
+                  onClick={async () => {
+                    try {
+                      // Chỉ gọi check-in nếu chưa điểm danh (status === 'CONFIRMED')
+                      if (appointment.status === 'CONFIRMED') {
+                        await checkInMutation.mutateAsync(appointment.id);
+                      }
+                      navigate(`/video-call/${appointment.id}`);
+                    } catch (error: any) {
+                      const errorMsg = error?.response?.data?.message || error?.message || 'Không thể tham gia phòng video';
+                      toast.error(errorMsg);
+                    }
+                  }}
+                  className={`px-4 py-2.5 rounded-xl border font-semibold whitespace-nowrap w-full sm:w-auto text-center flex items-center justify-center gap-2 ${
+                    checkInMutation.isPending 
+                      ? 'border-blue-300 text-blue-300 cursor-not-allowed' 
+                      : 'border-primary text-primary hover:bg-primary/5'
+                  }`}
                 >
-                  Vào phòng khám
-                </Link>
+                  {checkInMutation.isPending && (
+                    <span className="material-symbols-outlined text-sm animate-spin">hourglass_empty</span>
+                  )}
+                  {checkInMutation.isPending 
+                    ? 'Đang chuẩn bị...' 
+                    : appointment.status === 'CONFIRMED' 
+                      ? 'Điểm danh & Vào khám' 
+                      : 'Vào phòng khám'}
+                </button>
               ) : null}
 
               {appointment.status === 'COMPLETED' ? (
