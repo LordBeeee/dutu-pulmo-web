@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
 interface AgreementSectionProps {
   onConfirm: () => void;
   onBack: () => void;
@@ -9,13 +11,16 @@ export default function AgreementSection({
   onBack,
   loading = false,
 }: AgreementSectionProps) {
+  const [agreed, setAgreed] = useState(false);
+
   return (
     <div className="pt-4 text-center">
       <div className="flex items-start justify-center gap-3 mb-8 text-left max-w-xl mx-auto">
         <input
           id="terms"
           type="checkbox"
-          defaultChecked
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
           className="mt-1 w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
         />
 
@@ -43,11 +48,16 @@ export default function AgreementSection({
         </button>
 
         <button
-          type="button"
-          onClick={onConfirm}
-          disabled={loading}
+          onClick={() => {
+            if (!agreed) {
+              toast.error('Vui lòng đồng ý với điều khoản và điều kiện sử dụng');
+              return;
+            }
+            onConfirm();
+          }}
+          disabled={loading || !agreed}
           className={`w-full sm:flex-[2] text-white font-bold py-4 px-8 rounded-2xl shadow-lg transition-all active:scale-95 ${
-            loading
+            loading || !agreed
               ? "bg-slate-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 shadow-blue-200"
           }`}
@@ -62,4 +72,3 @@ export default function AgreementSection({
     </div>
   );
 }
-
