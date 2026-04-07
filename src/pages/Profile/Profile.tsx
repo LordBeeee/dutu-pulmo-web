@@ -176,7 +176,16 @@ function Profile() {
       toast.error('Không tìm thấy user id');
       return;
     }
+    
+    if (formData.dateOfBirth) {
+      const selectedDate = new Date(formData.dateOfBirth);
+      const today = new Date();
 
+      if (selectedDate > today) {
+        toast.error('Ngày sinh không được lớn hơn ngày hiện tại');
+        return;
+      }
+    }
     try {
       await updateUserMutation.mutateAsync({ userId, payload });
       toast.success('Cập nhật thông tin thành công');
