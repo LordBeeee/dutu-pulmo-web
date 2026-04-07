@@ -148,13 +148,25 @@ export function canCancelAppointment(
   status?: string,
   scheduledAt?: string,
 ): boolean {
-  if (!status) return false;
+  if (!status || !scheduledAt) return false;
 
-  if (scheduledAt && new Date(scheduledAt) < new Date()) {
+  const now = new Date();
+  const scheduledDate = new Date(scheduledAt);
+
+  if (scheduledDate < now) {
     return false;
   }
 
-  if (["PENDING", "PENDING_PAYMENT", "CONFIRMED"].includes(status)) return true;
+  const minutesUntilStart =
+    (scheduledDate.getTime() - now.getTime()) / (1000 * 60);
+
+  if (["PENDING", "PENDING_PAYMENT"].includes(status)) {
+    return minutesUntilStart > 0;
+  }
+
+  if (status === "CONFIRMED") {
+    return minutesUntilStart >= PATIENT_CANCEL_BEFORE_MINUTES;
+  }
 
   return false;
 }
