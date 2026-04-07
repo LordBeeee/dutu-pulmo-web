@@ -154,7 +154,7 @@ export function canCancelAppointment(
     return false;
   }
 
-  if (["PENDING", "PENDING_PAYMENT"].includes(status)) return true;
+  if (["PENDING", "PENDING_PAYMENT", "CONFIRMED"].includes(status)) return true;
 
   return false;
 }
