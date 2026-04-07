@@ -176,7 +176,15 @@ function Profile() {
       toast.error('Không tìm thấy user id');
       return;
     }
+    if (!formData.province) {
+      toast.error('Vui lòng chọn tỉnh / thành phố');
+      return;
+    }
     
+    if (!formData.ward) {
+      toast.error('Vui lòng chọn phường / xã');
+      return;
+    }
     if (formData.dateOfBirth) {
       const selectedDate = new Date(formData.dateOfBirth);
       const today = new Date();
