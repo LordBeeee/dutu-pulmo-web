@@ -81,13 +81,14 @@ function DoctorCard({ doctor, nearestSlots = [], nearestDayLabel = null }: Docto
                     <span className="text-xs font-medium text-slate-500">{nearestDayLabel}:</span>
                     <div className="flex flex-wrap gap-2">
                       {nearestSlots.slice(0, 3).map((slot) => (
-                        <span key={slot.id} className="px-2 py-1 border rounded-lg text-xs bg-green-50">
+                        <span key={slot.id} className="px-2 py-1 border rounded-lg text-xs bg-green-50 flex items-center gap-1">
+                          {slot.allowedAppointmentTypes?.includes('VIDEO') && (
+                            <span className="material-symbols-outlined text-[14px] text-indigo-600">videocam</span>
+                          )}
+                          {slot.allowedAppointmentTypes?.includes('IN_CLINIC') && (
+                            <span className="material-symbols-outlined text-[14px] text-emerald-600">apartment</span>
+                          )}
                           {new Date(slot.startTime).toLocaleTimeString('vi-VN', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                          {' - '}
-                          {new Date(slot.endTime).toLocaleTimeString('vi-VN', {
                             hour: '2-digit',
                             minute: '2-digit',
                           })}

@@ -188,18 +188,33 @@ function TimeSlotSection({
                   {formatVietnamTime(slot.endTime)}
                 </span>
 
-                <span className="block mt-2 text-xs font-medium text-emerald-600">
+                <div className="flex items-center justify-center gap-1.5 mt-2">
+                  {slot.allowedAppointmentTypes?.includes("VIDEO") && (
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-950/30 rounded text-indigo-600">
+                      <span className="material-symbols-outlined text-[14px]">videocam</span>
+                      <span className="text-[10px] font-bold">VIDEO</span>
+                    </div>
+                  )}
+                  {slot.allowedAppointmentTypes?.includes("IN_CLINIC") && (
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 rounded text-emerald-600">
+                      <span className="material-symbols-outlined text-[14px]">apartment</span>
+                      <span className="text-[10px] font-bold">TẠI PHÒNG KHÁM</span>
+                    </div>
+                  )}
+                </div>
+
+                <span className="block mt-2.5 text-[13px] font-semibold text-slate-600 dark:text-slate-400">
                   {formatCurrency(displayFee, slot.currency || "VND")}
                 </span>
 
                 <span
-                  className={`text-[11px] mt-2 inline-block px-2 py-1 rounded-full ${
+                  className={`text-[11px] mt-2 inline-block px-3 py-1 rounded-full font-medium ${
                     isSelected
-                      ? "bg-primary text-white"
-                      : "bg-blue-50 text-primary"
+                      ? "bg-primary text-white shadow-sm"
+                      : "bg-slate-200/50 dark:bg-slate-800 text-slate-500"
                   }`}
                 >
-                  Còn {remainingSlots} slot
+                  Còn {remainingSlots} chỗ
                 </span>
               </button>
             );
