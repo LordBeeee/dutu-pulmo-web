@@ -63,7 +63,7 @@ export default function AppointmentConfirm() {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  const chiefComplaint = stateChiefComplaint || (parsedSymptoms.length > 0 ? `Khám ${parsedSymptoms[0]}` : 'Khám bệnh');
+  const chiefComplaint = stateChiefComplaint || '';
 
   const isMeaningfulHtml = (value: string) => {
     const plain = value
@@ -169,7 +169,7 @@ export default function AppointmentConfirm() {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-slate-500 mb-2">Lý do khám</p>
-                <p className="font-medium text-slate-900">{chiefComplaint}</p>
+                <p className="font-medium text-slate-900">{chiefComplaint || '---'}</p>
               </div>
 
               <div>
