@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import DoctorPagination from '@/components/Doctor/DoctorPagination';
@@ -33,6 +34,9 @@ function parseOrder(value: string | null): SortOrder {
 
 function AppointmentSchedule() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
+
 
   const page = parsePositiveNumber(searchParams.get('page'), 1);
   const limit = parsePositiveNumber(searchParams.get('limit'), DEFAULT_LIMIT);
@@ -46,6 +50,9 @@ function AppointmentSchedule() {
   const safeStartDate = isInvalidDateRange ? undefined : startDate || undefined;
   const safeEndDate = isInvalidDateRange ? undefined : endDate || undefined;
 
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
   const queryParams: AppointmentListQuery = {
     page,
     limit,
@@ -85,7 +92,23 @@ function AppointmentSchedule() {
       order: 'DESC',
     });
   };
+  useEffect(() => {
+    if (isComposing) return;
 
+    const timer = window.setTimeout(() => {
+      const normalizedCurrent = search ?? '';
+      const normalizedInput = searchInput ?? '';
+
+      if (normalizedInput !== normalizedCurrent) {
+        updateParams({
+          search: normalizedInput,
+          page: 1,
+        });
+      }
+    }, 400);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput, isComposing, search]);
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -130,10 +153,24 @@ function AppointmentSchedule() {
             <div className="space-y-5">
               <div>
                 <label className="text-sm font-medium block mb-2">Từ khóa</label>
-                <input
+                {/* <input
                   type="text"
                   value={search}
                   onChange={(event) => updateParams({ search: event.target.value, page: 1 })}
+                  placeholder="Bác sĩ, mã lịch..."
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                /> */}
+                <input
+                  type="text"
+                  value={searchInput}
+                  onCompositionStart={() => setIsComposing(true)}
+                  onCompositionEnd={(event) => {
+                    setIsComposing(false);
+                    setSearchInput(event.currentTarget.value);
+                  }}
+                  onChange={(event) => {
+                    setSearchInput(event.target.value);
+                  }}
                   placeholder="Bác sĩ, mã lịch..."
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 />
