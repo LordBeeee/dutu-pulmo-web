@@ -141,19 +141,19 @@ export default function MedicalRecordsPage() {
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-1 top-1 text-slate-400 text-lg">search</span>
                   <input
-                  type="text"
-                  value={searchInput}
-                  onCompositionStart={() => setIsComposing(true)}
-                  onCompositionEnd={(event) => {
-                    setIsComposing(false);
-                    setSearchInput(event.currentTarget.value);
-                  }}
-                  onChange={(event) => {
-                    setSearchInput(event.target.value);
-                  }}
-                  placeholder="Mã hồ sơ, bác sĩ..."
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm pl-5"
-                />
+                    type="text"
+                    value={searchInput}
+                    onCompositionStart={() => setIsComposing(true)}
+                    onCompositionEnd={(event) => {
+                      setIsComposing(false);
+                      setSearchInput(event.currentTarget.value);
+                    }}
+                    onChange={(event) => {
+                      setSearchInput(event.target.value);
+                    }}
+                    placeholder="Mã hồ sơ, bác sĩ..."
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm pl-5"
+                  />
                 </div>
               </div>
 
