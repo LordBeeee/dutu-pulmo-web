@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useMedicalRecords } from '@/hooks/use-medical-records';
 import MedicalRecordCard from '@/components/medical/MedicalRecordCard';
@@ -18,6 +18,8 @@ export default function MedicalRecordsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: records = [], isLoading, isError, refetch } = useMedicalRecords();
 
+  const [searchInput, setSearchInput] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
   // Params
   const search = searchParams.get('search') ?? '';
   const status = searchParams.get('status') ?? '';
@@ -25,11 +27,22 @@ export default function MedicalRecordsPage() {
   const endDate = searchParams.get('endDate') ?? '';
   const page = Number(searchParams.get('page')) || 1;
 
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
   const updateParams = (next: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams(searchParams);
+    // Object.entries(next).forEach(([key, value]) => {
+    //   if (!value) params.delete(key);
+    //   else params.set(key, String(value));
+    // });
     Object.entries(next).forEach(([key, value]) => {
-      if (!value) params.delete(key);
-      else params.set(key, String(value));
+      if (value === undefined || value === '' || value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
     });
     setSearchParams(params);
   };
@@ -65,6 +78,23 @@ export default function MedicalRecordsPage() {
     return filteredRecords.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredRecords, page]);
 
+  useEffect(() => {
+    if (isComposing) return;
+
+    const timer = window.setTimeout(() => {
+      const normalizedCurrent = search ?? '';
+      const normalizedInput = searchInput ?? '';
+
+      if (normalizedInput !== normalizedCurrent) {
+        updateParams({
+          search: normalizedInput,
+          page: 1,
+        });
+      }
+    }, 400);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput, isComposing, search]);
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumbs */}
@@ -109,14 +139,21 @@ export default function MedicalRecordsPage() {
               <div>
                 <label className="text-sm font-medium block mb-2">Tìm kiếm</label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">search</span>
+                  <span className="material-symbols-outlined absolute left-1 top-1 text-slate-400 text-lg">search</span>
                   <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => updateParams({ search: e.target.value, page: 1 })}
-                    placeholder="Mã hồ sơ, bác sĩ..."
-                    className="w-full rounded-lg border border-slate-200 pl-10 pr-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                  />
+                  type="text"
+                  value={searchInput}
+                  onCompositionStart={() => setIsComposing(true)}
+                  onCompositionEnd={(event) => {
+                    setIsComposing(false);
+                    setSearchInput(event.currentTarget.value);
+                  }}
+                  onChange={(event) => {
+                    setSearchInput(event.target.value);
+                  }}
+                  placeholder="Mã hồ sơ, bác sĩ..."
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm pl-5"
+                />
                 </div>
               </div>
 

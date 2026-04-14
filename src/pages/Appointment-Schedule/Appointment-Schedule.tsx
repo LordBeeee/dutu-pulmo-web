@@ -153,13 +153,6 @@ function AppointmentSchedule() {
             <div className="space-y-5">
               <div>
                 <label className="text-sm font-medium block mb-2">Từ khóa</label>
-                {/* <input
-                  type="text"
-                  value={search}
-                  onChange={(event) => updateParams({ search: event.target.value, page: 1 })}
-                  placeholder="Bác sĩ, mã lịch..."
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                /> */}
                 <input
                   type="text"
                   value={searchInput}
