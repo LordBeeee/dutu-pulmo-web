@@ -15,25 +15,47 @@ export const TypingEffect: React.FC<TypingEffectProps> = ({
 }) => {
   const [displayedText, setDisplayedText] = useState('');
 
+  // useEffect(() => {
+  //   setDisplayedText('');
+
+  //   // Dùng spread [...text] thay vì charAt để handle đúng emoji 4-byte (surrogate pairs)
+  //   const chars = [...text];
+  //   let index = 0;
+
+  //   const timer = setInterval(() => {
+  //     if (index < chars.length) {
+  //       setDisplayedText((prev) => prev + chars[index]);
+  //       index++;
+  //     } else {
+  //       clearInterval(timer);
+  //       if (onComplete) onComplete();
+  //     }
+  //   }, speed);
+
+  //   return () => clearInterval(timer);
+  // }, [text, speed, onComplete]);
+
   useEffect(() => {
-    setDisplayedText('');
-
-    // Dùng spread [...text] thay vì charAt để handle đúng emoji 4-byte (surrogate pairs)
-    const chars = [...text];
-    let index = 0;
-
-    const timer = setInterval(() => {
-      if (index < chars.length) {
-        setDisplayedText((prev) => prev + chars[index]);
-        index++;
-      } else {
-        clearInterval(timer);
-        if (onComplete) onComplete();
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed, onComplete]);
+      setDisplayedText('');
+  
+      const safeText = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+      const chars = Array.from(safeText);
+  
+      let index = 0;
+  
+      const timer = setInterval(() => {
+        if (index < chars.length) {
+          const char = chars[index] ?? '';
+          setDisplayedText((prev) => prev + char);
+          index++;
+        } else {
+          clearInterval(timer);
+          onComplete?.();
+        }
+      }, speed);
+  
+      return () => clearInterval(timer);
+    }, [text, speed]);
 
   // Render với \n -> <br/> để xuống dòng đúng
   return (
