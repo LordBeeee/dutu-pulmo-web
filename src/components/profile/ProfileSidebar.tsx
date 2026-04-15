@@ -34,9 +34,9 @@ export function ProfileSidebar() {
 
   const menuGroups = [
     {
-      title: "Hồ sơ y tế",
+      title: "Hồ sơ bệnh án",
       items: [
-        { label: "Hồ sơ y tế", to: "/medical-records", icon: "folder_open" },
+        { label: "Hồ sơ bệnh án", to: "/medical-records", icon: "folder_open" },
         { label: "Đơn thuốc", to: "/prescriptions", icon: "medication" },
       ],
     },

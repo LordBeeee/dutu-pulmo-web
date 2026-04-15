@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { usePrescriptions } from '@/hooks/use-prescriptions';
 import PrescriptionCard from '@/components/medical/PrescriptionCard';
@@ -19,17 +19,13 @@ export default function PrescriptionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: prescriptions = [], isLoading, isError, refetch } = usePrescriptions();
 
-  const [searchInput, setSearchInput] = useState('');
-  const [isComposing, setIsComposing] = useState(false);
   // Params
   const search = searchParams.get('search') ?? '';
   const status = searchParams.get('status') ?? '';
   const startDate = searchParams.get('startDate') ?? '';
   const endDate = searchParams.get('endDate') ?? '';
   const page = Number(searchParams.get('page')) || 1;
-  useEffect(() => {
-    setSearchInput(search);
-  }, [search]);
+
   const updateParams = (next: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams(searchParams);
     Object.entries(next).forEach(([key, value]) => {
@@ -69,23 +65,6 @@ export default function PrescriptionsPage() {
     return filteredPrescriptions.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredPrescriptions, page]);
 
-  useEffect(() => {
-    if (isComposing) return;
-
-    const timer = window.setTimeout(() => {
-      const normalizedCurrent = search ?? '';
-      const normalizedInput = searchInput ?? '';
-
-      if (normalizedInput !== normalizedCurrent) {
-        updateParams({
-          search: normalizedInput,
-          page: 1,
-        });
-      }
-    }, 400);
-
-    return () => window.clearTimeout(timer);
-  }, [searchInput, isComposing, search]);
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumbs */}
@@ -130,27 +109,13 @@ export default function PrescriptionsPage() {
               <div>
                 <label className="text-sm font-medium block mb-2">Tìm kiếm</label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1 text-slate-400 text-lg">search</span>
-                  {/* <input
+                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">search</span>
+                  <input
                     type="text"
                     value={search}
                     onChange={(e) => updateParams({ search: e.target.value, page: 1 })}
                     placeholder="Mã đơn, bác sĩ..."
                     className="w-full rounded-lg border border-slate-200 pl-10 pr-3 py-2 text-sm focus:border-primary outline-none"
-                  /> */}
-                  <input
-                    type="text"
-                    value={searchInput}
-                    onCompositionStart={() => setIsComposing(true)}
-                    onCompositionEnd={(event) => {
-                      setIsComposing(false);
-                      setSearchInput(event.currentTarget.value);
-                    }}
-                    onChange={(event) => {
-                      setSearchInput(event.target.value);
-                    }}
-                    placeholder="Mã đơn, bác sĩ..."
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm pl-10"
                   />
                 </div>
               </div>

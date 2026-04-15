@@ -19,8 +19,8 @@ export default function MedicalRecordCard({ record }: MedicalRecordCardProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-start gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 min-w-0">
+        <div className="flex items-start gap-4 flex-1 min-w-0">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
             <span className="material-symbols-outlined text-primary text-2xl">description</span>
           </div>
@@ -47,10 +47,10 @@ export default function MedicalRecordCard({ record }: MedicalRecordCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end md:self-center">
+        <div className="flex items-center gap-2 self-end md:self-center flex-shrink-0">
           <Link
             to={`/medical-records/${record.id}`}
-            className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50 transition-colors"
+            className="flex items-center justify-center px-4 h-10 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50 transition-colors bg-white shadow-sm"
           >
             Chi tiết
           </Link>
@@ -59,7 +59,7 @@ export default function MedicalRecordCard({ record }: MedicalRecordCardProps) {
               href={record.pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors shadow-sm"
               title="Xem PDF"
             >
               <span className="material-symbols-outlined text-xl">picture_as_pdf</span>

@@ -1,9 +1,18 @@
-import type { Doctor } from './doctor';
-import type { UserProfile } from './user';
+import type { Doctor } from "./doctor";
+import type { UserProfile } from "./user";
 
-export type MedicalRecordStatus = 'DRAFT' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type MedicalRecordStatus =
+  | "DRAFT"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED";
 
-export type PrescriptionStatus = 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
+export type PrescriptionStatus =
+  | "PENDING"
+  | "ACTIVE"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "EXPIRED";
 
 export interface LinkRecordInfo {
   id: string;
@@ -17,6 +26,7 @@ export interface Patient {
   id: string;
   profileCode?: string;
   user?: UserProfile;
+  fullName?: string;
 }
 
 export interface VitalSign {
@@ -74,7 +84,7 @@ export interface MedicalRecord {
   treatmentPlan?: string;
   progressNotes?: string;
   status: MedicalRecordStatus;
-  signedStatus?: 'SIGNED' | 'NOT_SIGNED';
+  signedStatus?: "SIGNED" | "NOT_SIGNED";
   createdAt: string;
   updatedAt: string;
   pdfUrl?: string;
@@ -83,7 +93,7 @@ export interface MedicalRecord {
   followUpRequired?: boolean;
   nextAppointmentDate?: string;
   followUpInstructions?: string;
-  
+
   // New fields from mobile
   surgicalHistory?: string;
   familyHistory?: string;
