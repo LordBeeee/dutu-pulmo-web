@@ -1,4 +1,4 @@
-﻿import { api } from "@/services/api";
+import { api } from "@/services/api";
 import type { UserProfile } from "@/types/user";
 import { cleanParams } from "@/utils/query";
 
@@ -25,9 +25,26 @@ export type UpdateProfilePayload = {
   address?: string | null;
 };
 
+export type UpdatePatientPayload = {
+  bloodType?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
+  insuranceProvider?: string;
+  insuranceNumber?: string;
+  insuranceExpiry?: string | null;
+};
+
 export type MyPatientProfile = {
   id: string;
   profileCode?: string;
+  bloodType?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
+  insuranceProvider?: string;
+  insuranceNumber?: string;
+  insuranceExpiry?: string;
   user?: UserProfile | null;
 };
 
@@ -44,6 +61,14 @@ export const profileService = {
 
   updateUser: async (userId: string, payload: UpdateProfilePayload) => {
     const { data } = await api.patch<UserProfile>(`/users/${userId}`, payload);
+    return data;
+  },
+
+  updatePatient: async (patientId: string, payload: UpdatePatientPayload) => {
+    const { data } = await api.patch<MyPatientProfile>(
+      `/patients/${patientId}`,
+      payload,
+    );
     return data;
   },
 

@@ -98,6 +98,24 @@ export function useUpdateMyUser() {
   });
 }
 
+export function useUpdateMyPatient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      patientId,
+      payload,
+    }: {
+      patientId: string;
+      payload: any;
+    }) => profileService.updatePatient(patientId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: profileKeys.me });
+      void queryClient.invalidateQueries({ queryKey: profileKeys.patient });
+    },
+  });
+}
+
 export function useUploadAvatar() {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);

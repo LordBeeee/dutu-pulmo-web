@@ -5,8 +5,10 @@ import { toast } from 'sonner';
 import {
   useCountries,
   useEthnicities,
+  useMyPatient,
   useProfile,
   useProvinces,
+  useUpdateMyPatient,
   useUpdateMyUser,
   useWards,
 } from '@/hooks/use-profile';
@@ -33,6 +35,14 @@ type FormData = {
   province: string;
   ward: string;
   address: string;
+  // Patient fields
+  bloodType: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelationship: string;
+  insuranceProvider: string;
+  insuranceNumber: string;
+  insuranceExpiry: string;
 };
 
 const EMPTY_FORM: FormData = {
@@ -48,16 +58,25 @@ const EMPTY_FORM: FormData = {
   province: '',
   ward: '',
   address: '',
+  bloodType: '',
+  emergencyContactName: '',
+  emergencyContactPhone: '',
+  emergencyContactRelationship: '',
+  insuranceProvider: '',
+  insuranceNumber: '',
+  insuranceExpiry: '',
 };
 
 function Profile() {
   const user = useAuthStore((state) => state.user);
 
   const profileQuery = useProfile();
+  const myPatientQuery = useMyPatient();
   const countriesQuery = useCountries();
   const ethnicitiesQuery = useEthnicities();
   const provincesQuery = useProvinces();
   const updateUserMutation = useUpdateMyUser();
+  const updatePatientMutation = useUpdateMyPatient();
 
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [occupationOption, setOccupationOption] = useState<Option | null>(null);
@@ -69,13 +88,15 @@ function Profile() {
     if (!profileQuery.data) return;
 
     const me = profileQuery.data;
+    const patient = myPatientQuery.data;
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormData({
       fullName: me.fullName ?? '',
       gender: me.gender ?? '',
       email: me.email ?? '',
       phone: me.phone ?? '',
-      dateOfBirth: me.dateOfBirth ?? '',
+      dateOfBirth: me.dateOfBirth ? me.dateOfBirth.split('T')[0] : '',
       occupation: me.occupation ?? '',
       CCCD: me.CCCD ?? '',
       nationality: me.nationality ?? '',
@@ -83,8 +104,15 @@ function Profile() {
       province: me.provinceCode ?? '',
       ward: me.wardCode ?? '',
       address: me.address ?? '',
+      bloodType: patient?.bloodType ?? '',
+      emergencyContactName: patient?.emergencyContactName ?? '',
+      emergencyContactPhone: patient?.emergencyContactPhone ?? '',
+      emergencyContactRelationship: patient?.emergencyContactRelationship ?? '',
+      insuranceProvider: patient?.insuranceProvider ?? '',
+      insuranceNumber: patient?.insuranceNumber ?? '',
+      insuranceExpiry: patient?.insuranceExpiry ? patient.insuranceExpiry.split('T')[0] : '',
     });
-  }, [profileQuery.data]);
+  }, [profileQuery.data, myPatientQuery.data]);
 
   useEffect(() => {
     const occupationCode = formData.occupation;
@@ -115,7 +143,7 @@ function Profile() {
   const provinces = provincesQuery.data ?? [];
   const wards = wardsQuery.data ?? [];
 
-  const loading = updateUserMutation.isPending;
+  const loading = updateUserMutation.isPending || updatePatientMutation.isPending;
 
   const loadOccupations = async (inputValue: string) => {
     const keyword = inputValue.trim();
@@ -147,7 +175,6 @@ function Profile() {
     }));
   };
 
-
   const payload = useMemo(
     () => ({
       fullName: formData.fullName,
@@ -163,6 +190,19 @@ function Profile() {
       province: provinces.find((p) => String(p.code) === formData.province)?.name || null,
       ward: wards.find((w) => String(w.code) === formData.ward)?.name || null,
       address: formData.address || null,
+    }),
+    [formData, provinces, wards],
+  );
+
+  const patientPayload = useMemo(
+    () => ({
+      bloodType: formData.bloodType || null,
+      emergencyContactName: formData.emergencyContactName || null,
+      emergencyContactPhone: formData.emergencyContactPhone || null,
+      emergencyContactRelationship: formData.emergencyContactRelationship || null,
+      insuranceProvider: formData.insuranceProvider || null,
+      insuranceNumber: formData.insuranceNumber || null,
+      insuranceExpiry: formData.insuranceExpiry || null,
     }),
     [formData],
   );
@@ -195,7 +235,20 @@ function Profile() {
       }
     }
     try {
-      await updateUserMutation.mutateAsync({ userId, payload });
+      const updatePromises: Promise<any>[] = [
+        updateUserMutation.mutateAsync({ userId, payload }),
+      ];
+
+      if (myPatientQuery.data?.id) {
+        updatePromises.push(
+          updatePatientMutation.mutateAsync({
+            patientId: myPatientQuery.data.id,
+            payload: patientPayload,
+          }),
+        );
+      }
+
+      await Promise.all(updatePromises);
       toast.success('Cập nhật thông tin thành công');
     } catch (error) {
       const errorMessage =
@@ -335,6 +388,63 @@ function Profile() {
           <div className="space-y-2">
             <label className="text-sm font-semibold">Địa chỉ</label>
             <textarea rows={3} className="w-full px-4 py-2.5 border rounded-xl shadow-none" name="address" value={formData.address} onChange={handleChange}></textarea>
+          </div>
+
+          {/* EMERGENCY CONTACT SECTION */}
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <span className="material-symbols-outlined text-red-500">contact_emergency</span>
+                Thông tin người liên hệ khẩn cấp
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Họ và tên</label>
+                <input type="text" name="emergencyContactName" value={formData.emergencyContactName} onChange={handleChange} placeholder="Nhập tên người liên hệ" className="w-full px-4 py-2.5 border rounded-xl outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Số điện thoại</label>
+                <input type="text" name="emergencyContactPhone" value={formData.emergencyContactPhone} onChange={handleChange} placeholder="Nhập số điện thoại" className="w-full px-4 py-2.5 border rounded-xl outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Mối quan hệ</label>
+                <input type="text" name="emergencyContactRelationship" value={formData.emergencyContactRelationship} onChange={handleChange} placeholder="VD: Bố, Mẹ, Vợ..." className="w-full px-4 py-2.5 border rounded-xl outline-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* INSURANCE SECTION */}
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-500">verified_user</span>
+                Thông tin bảo hiểm & Y tế
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Nhà cung cấp bảo hiểm</label>
+                <input type="text" name="insuranceProvider" value={formData.insuranceProvider} onChange={handleChange} placeholder="VD: Bảo Hiểm Xã Hội Việt Nam" className="w-full px-4 py-2.5 border rounded-xl outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Số bảo hiểm y tế</label>
+                <input type="text" name="insuranceNumber" value={formData.insuranceNumber} onChange={handleChange} placeholder="VD: GD1234567890" className="w-full px-4 py-2.5 border rounded-xl outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Ngày hết hạn</label>
+                <input type="date" name="insuranceExpiry" value={formData.insuranceExpiry} onChange={handleChange} className="w-full px-4 py-2.5 border rounded-xl outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Nhóm máu</label>
+                <select name="bloodType" value={formData.bloodType} onChange={handleChange} className="w-full px-4 py-2.5 border rounded-xl outline-none bg-slate-50">
+                  <option value="">-- Chọn nhóm máu --</option>
+                  {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 pt-4 items-center">
