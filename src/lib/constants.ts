@@ -28,6 +28,6 @@ export const DEFAULT_DOCTOR_FILTERS: DoctorFilters = {
 };
 
 export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 export const SOCKET_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
